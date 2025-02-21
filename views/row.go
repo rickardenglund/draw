@@ -3,8 +3,8 @@ package views
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 
-	"draw/draw"
-	"draw/theme"
+	"github.com/rickardenglund/draw/draw"
+	"github.com/rickardenglund/draw/theme"
 )
 
 type RowView struct {

@@ -5,7 +5,7 @@ import (
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 
-	"draw/theme"
+	"github.com/rickardenglund/draw/theme"
 )
 
 func drawAxisX(target rl.Rectangle, s scale) {

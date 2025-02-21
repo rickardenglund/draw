@@ -1,4 +1,4 @@
-module draw
+module github.com/rickardenglund/draw
 
 go 1.23.5
 

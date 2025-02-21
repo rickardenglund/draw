@@ -4,7 +4,7 @@ import (
 	ea "github.com/gen2brain/raylib-go/easings"
 	rl "github.com/gen2brain/raylib-go/raylib"
 
-	"draw/theme"
+	"github.com/rickardenglund/draw/theme"
 )
 
 type Circle struct {

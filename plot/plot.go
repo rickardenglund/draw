@@ -5,7 +5,7 @@ import (
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 
-	"draw/theme"
+	"github.com/rickardenglund/draw/theme"
 )
 
 type Plot struct {
@@ -77,7 +77,7 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 
 	mp := rl.GetMousePosition()
 	ci, d := findClosest(screenPs, mp)
-	if d < 30 {
+	if d < 30 && rl.CheckCollisionPointRec(mp, targetWidget) {
 		p := ps[ci]
 		fmtString := fmt.Sprintf("Y: %s\nX: %s", getFmt(0, p.Y), getFmt(0, p.X))
 		msg := fmt.Sprintf(fmtString, p.Y, p.X)
@@ -85,13 +85,12 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 		rl.DrawLineEx(mp, screenPs[ci], 1, theme.Charcoal)
 		rl.DrawCircleV(mp, 3, theme.Charcoal)
 		rl.DrawCircleV(screenPs[ci], 3, theme.Charcoal)
-
 	}
 }
 
 func textArea(mp rl.Vector2, msg string) {
 	fontSize := float32(20)
-	spacing := float32(.5)
+	spacing := float32(0)
 	ms := rl.MeasureTextEx(theme.Font, msg, fontSize, spacing)
 
 	padding := float32(10)

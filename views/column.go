@@ -3,7 +3,7 @@ package views
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 
-	"draw/draw"
+	"github.com/rickardenglund/draw/draw"
 )
 
 type ColumnView struct {

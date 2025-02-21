@@ -3,13 +3,13 @@ package main
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 
-	"draw/draw"
-	"draw/plot"
-	"draw/shapes"
-	"draw/sound"
-	"draw/theme"
-	"draw/views"
-	"draw/widget"
+	"github.com/rickardenglund/draw/draw"
+	"github.com/rickardenglund/draw/plot"
+	"github.com/rickardenglund/draw/shapes"
+	"github.com/rickardenglund/draw/sound"
+	"github.com/rickardenglund/draw/theme"
+	"github.com/rickardenglund/draw/views"
+	"github.com/rickardenglund/draw/widget"
 )
 
 func main() {
@@ -44,5 +44,5 @@ func main() {
 		),
 	)
 
-	draw.NewWindow(rl.NewVector2(800, 400), v)
+	draw.NewWindow(rl.NewVector2(900, 550), v)
 }
