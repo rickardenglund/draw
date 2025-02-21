@@ -32,8 +32,8 @@ func main() {
 			plot.NewPlot(d.getSP),
 			views.NewColumnView(
 				views.NewRowView(
-					widget.NewButton(d.update),
-					widget.NewButton(f),
+					widget.NewButton("Update Plot", d.update),
+					widget.NewButton("New Size", f),
 					myC,
 				),
 				sound.NewPlayer(d.getTWF),

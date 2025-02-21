@@ -41,7 +41,7 @@ func xTick(target rl.Rectangle, s scale, x float32, format string) {
 	rl.DrawCircleV(sp, 3, theme.Salmon)
 	text := fmt.Sprintf(format, x)
 	fontSize := float32(14)
-	spacing := float32(1)
+	spacing := float32(.5)
 
 	m := rl.MeasureTextEx(theme.Font, text, fontSize, spacing)
 	tp := rl.Vector2Add(sp, rl.NewVector2(-(m.X/2), 3))
@@ -72,7 +72,7 @@ func tick(target rl.Rectangle, s scale, y float32, format string) {
 
 	text := fmt.Sprintf(format, y)
 	fontSize := float32(14)
-	spacing := float32(1)
+	spacing := float32(.5)
 	m := rl.MeasureTextEx(theme.Font, text, fontSize, spacing)
 	p = rl.Vector2Add(p, rl.NewVector2(-m.X-3, -m.Y/2))
 	rl.DrawTextEx(theme.Font, text, p, fontSize, spacing, theme.Charcoal)

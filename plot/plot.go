@@ -79,8 +79,8 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 	ci, d := findClosest(screenPs, mp)
 	if d < 30 {
 		p := ps[ci]
-		fmtString := fmt.Sprintf("X: %s\nY: %s", getFmt(0, p.X), getFmt(0, p.Y))
-		msg := fmt.Sprintf(fmtString, p.X, p.Y)
+		fmtString := fmt.Sprintf("Y: %s\nX: %s", getFmt(0, p.Y), getFmt(0, p.X))
+		msg := fmt.Sprintf(fmtString, p.Y, p.X)
 		textArea(mp, msg)
 		rl.DrawLineEx(mp, screenPs[ci], 1, theme.Charcoal)
 		rl.DrawCircleV(mp, 3, theme.Charcoal)
@@ -91,7 +91,7 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 
 func textArea(mp rl.Vector2, msg string) {
 	fontSize := float32(20)
-	spacing := float32(1)
+	spacing := float32(.5)
 	ms := rl.MeasureTextEx(theme.Font, msg, fontSize, spacing)
 
 	padding := float32(10)

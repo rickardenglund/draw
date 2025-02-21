@@ -76,30 +76,39 @@ func (d *data) getTWF() []rl.Vector2 {
 }
 
 func getSine() []rl.Vector2 {
+	noiseLevel := float64(1)
 	sr := 44100.0
 	dt := 1.0 / sr
 
 	bf := rand.Float64()*5000 + 200
+	rpm := float64(1200)
 
 	fs := []func(t float64) float64{}
-	nf := 4
-	for i := range nf {
-		f := bf * float64(i+1)
-		fs = append(fs, func(t float64) float64 {
-			return math.Sin(t*math.Pi*2*f) * 5 * (1 / float64(i+1))
-		})
+	nOvertones := 4
+	for io := range nOvertones {
+		f := bf * float64(io+1)
+		nSideBand := 4
+		for i := range nSideBand {
+			fs = append(fs, func(t float64) float64 {
+				return math.Sin(t*math.Pi*2*(f-float64(i)*rpm)) * 5 * (1 / float64(i+1)) * (1.0 / float64(io+1))
+			})
+			fs = append(fs, func(t float64) float64 {
+				return math.Sin(t*math.Pi*2*(f+float64(i)*rpm)) * 5 * (1 / float64(i+1)) * (1.0 / float64(io+1))
+			})
+		}
 	}
 
-	n := 44100 / 64
+	n := 44100 / 1 //64
 	ps := make([]rl.Vector2, n)
 	for i := range n {
 		t := float64(i) * dt
-		//v := math.Sin(t*math.Pi*2*f) * 5
-		//v += math.Sin(t*math.Pi*2*f*2) * 10
 		v := float64(0)
 		for _, f := range fs {
 			v += f(t)
 		}
+
+		v += rand.Float64() * noiseLevel
+
 		ps[i] = rl.NewVector2(float32(t), float32(v))
 
 	}
