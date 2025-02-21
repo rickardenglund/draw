@@ -1,0 +1,34 @@
+package draw
+
+import (
+	rl "github.com/gen2brain/raylib-go/raylib"
+
+	"draw/theme"
+)
+
+func NewWindow(size rl.Vector2, objs ...Drawable) {
+	rl.SetTraceLogLevel(rl.LogWarning)
+	rl.InitWindow(int32(size.X), int32(size.Y), "win name")
+	theme.Font = rl.GetFontDefault()
+	defer rl.CloseWindow()
+
+	rl.InitAudioDevice()
+	defer rl.CloseAudioDevice()
+
+	for _, o := range objs {
+		o.Init()
+	}
+
+	for !rl.WindowShouldClose() {
+		rl.BeginDrawing()
+		rl.ClearBackground(theme.Nude)
+		for i := range objs {
+			border := rl.NewVector2(1, 1)
+			ms := rl.Vector2Subtract(size, rl.Vector2Scale(border, 2))
+			p := border
+			tar := rl.NewRectangle(p.X, p.Y, ms.X, ms.Y)
+			objs[i].Draw(tar)
+		}
+		rl.EndDrawing()
+	}
+}
