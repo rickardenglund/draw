@@ -78,9 +78,13 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 	mp := rl.GetMousePosition()
 	ci, d := findClosest(screenPs, mp)
 	if d < 30 {
-		p := screenPs[ci]
-		msg := fmt.Sprintf("X: %.2f\nY: %.2f", p.X, p.Y)
+		p := ps[ci]
+		fmtString := fmt.Sprintf("X: %s\nY: %s", getFmt(0, p.X), getFmt(0, p.Y))
+		msg := fmt.Sprintf(fmtString, p.X, p.Y)
 		textArea(mp, msg)
+		rl.DrawLineEx(mp, screenPs[ci], 1, theme.Charcoal)
+		rl.DrawCircleV(mp, 3, theme.Charcoal)
+		rl.DrawCircleV(screenPs[ci], 3, theme.Charcoal)
 
 	}
 }
@@ -91,15 +95,19 @@ func textArea(mp rl.Vector2, msg string) {
 	ms := rl.MeasureTextEx(theme.Font, msg, fontSize, spacing)
 
 	padding := float32(10)
-	paddedRect := rl.NewRectangle(mp.X, mp.Y-ms.Y-2*padding, ms.X+2*padding, ms.Y+2*padding)
+	paddedRect := rl.NewRectangle(mp.X-(ms.X+2*padding), mp.Y-ms.Y-2*padding, ms.X+2*padding, ms.Y+2*padding)
 	if paddedRect.Y < 0 {
 		paddedRect.Y = 0
+	}
+	if paddedRect.X < 0 {
+		paddedRect.X = 0
 	}
 
 	target := rl.NewVector2(paddedRect.X+padding, paddedRect.Y+padding)
 
-	rl.DrawRectangleRec(paddedRect, rl.ColorAlpha(theme.Charcoal, .8))
-	rl.DrawTextEx(theme.Font, msg, target, fontSize, spacing, rl.White)
+	rl.DrawRectangleRec(paddedRect, rl.ColorAlpha(theme.Nude, .8))
+	rl.DrawRectangleLinesEx(paddedRect, 2, rl.ColorAlpha(theme.Charcoal, .8))
+	rl.DrawTextEx(theme.Font, msg, target, fontSize, spacing, theme.Charcoal)
 
 }
 

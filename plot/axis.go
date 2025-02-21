@@ -18,11 +18,17 @@ func drawAxisX(target rl.Rectangle, s scale) {
 }
 
 func getFmt(minV, maxV float32) string {
+	if maxV < 0 {
+		maxV *= -1
+	}
+
 	switch {
-	case maxV < 1:
+	case maxV < 10 && maxV >= .1:
 		return "%.1f"
-	case maxV < .1:
-		return "%.2f"
+	case maxV < .1 && maxV >= .01:
+		return "%.3f"
+	case maxV < .01:
+		return "%.4f"
 	default:
 		return "%.0f"
 
