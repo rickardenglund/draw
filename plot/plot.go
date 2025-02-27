@@ -13,8 +13,6 @@ type Plot struct {
 	getPs func() []rl.Vector2
 }
 
-func (p *Plot) Init() {}
-
 func (p *Plot) Draw(targetWidget rl.Rectangle) {
 	margin := float32(10)
 	targetPlot := rl.NewRectangle(

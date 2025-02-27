@@ -14,9 +14,6 @@ type Circle struct {
 	animStart float64
 }
 
-func (c *Circle) Init() {
-}
-
 func NewCircle(radius float32, clr rl.Color) *Circle {
 	return &Circle{
 		radius:    radius,

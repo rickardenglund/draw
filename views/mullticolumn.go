@@ -12,12 +12,6 @@ type MultiColumnView struct {
 	active int
 }
 
-func (c *MultiColumnView) Init() {
-	for _, o := range c.objs {
-		o.Full.Init()
-	}
-}
-
 func (c *MultiColumnView) Draw(target rl.Rectangle) {
 	c.handleKeys()
 	panelWidth := float32(0)

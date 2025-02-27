@@ -5,6 +5,5 @@ import (
 )
 
 type Drawable interface {
-	Init()
 	Draw(target rl.Rectangle)
 }

@@ -12,8 +12,6 @@ type Button struct {
 	title  string
 }
 
-func (b *Button) Init() {}
-
 func (b *Button) Draw(target rl.Rectangle) {
 	fontSize := float32(14)
 	spacing := float32(.5)

@@ -18,10 +18,6 @@ func NewWindow(size rl.Vector2, objs ...Drawable) {
 	rl.InitAudioDevice()
 	defer rl.CloseAudioDevice()
 
-	for _, o := range objs {
-		o.Init()
-	}
-
 	for !rl.WindowShouldClose() {
 		rl.BeginDrawing()
 		rl.ClearBackground(theme.Nude)

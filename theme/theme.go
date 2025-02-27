@@ -12,10 +12,6 @@ import (
 //	Orchid = rl.NewColor(218, 112, 214, 255)
 //)
 
-func init() {
-	Font = rl.GetFontDefault()
-}
-
 var (
 	Muave    = rl.NewColor(224, 176, 255, 255)
 	Salmon   = rl.NewColor(250, 128, 114, 255)

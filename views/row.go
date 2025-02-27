@@ -33,12 +33,6 @@ func (r RowView) Draw(target rl.Rectangle) {
 	}
 }
 
-func (r RowView) Init() {
-	for _, o := range r.objs {
-		o.Init()
-	}
-}
-
 func NewRowView(objs ...draw.Drawable) draw.Drawable {
 	return RowView{objs: objs}
 }

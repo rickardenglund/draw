@@ -13,9 +13,6 @@ type Player struct {
 	getPs func() []rl.Vector2
 }
 
-func (p *Player) Init() {
-}
-
 func (p *Player) loadAudio() {
 	ps := p.getPs()
 	minY, maxY := float32(0), float32(0)
