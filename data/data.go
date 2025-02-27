@@ -105,7 +105,7 @@ func getSine() []rl.Vector2 {
 	ps := make([]rl.Vector2, n)
 	for i := range n {
 		t := float64(i) * dt
-		v := float64(100) * 0
+		v := float64(100)
 		for _, f := range fs {
 			v += f(t)
 		}

@@ -7,7 +7,6 @@ import (
 	"github.com/rickardenglund/draw/draw"
 	"github.com/rickardenglund/draw/plot"
 	"github.com/rickardenglund/draw/shapes"
-	"github.com/rickardenglund/draw/sound"
 	"github.com/rickardenglund/draw/theme"
 	"github.com/rickardenglund/draw/views"
 	"github.com/rickardenglund/draw/widget"
@@ -28,22 +27,13 @@ func main() {
 		myC.Set(r)
 	}
 
-	player := sound.NewPlayer(d.GetTWF)
-
-	update := func() {
-		d.Update()
-		player.Play()
-	}
 	v := views.NewColumnView(
 		views.NewRowView(
 			plot.NewPlot(d.GetSP),
-			views.NewColumnView(
-				views.NewRowView(
-					widget.NewButton("Update Plot", update),
-					widget.NewButton("New Size", f),
-					myC,
-				),
-				player,
+			views.NewMultiColumnView(
+				views.MultiItem{Label: "Update", Full: widget.NewButton("Update Plot", d.Update)},
+				views.MultiItem{Label: "size", Full: widget.NewButton("New Size", f)},
+				views.MultiItem{Label: "shape", Full: myC},
 			),
 		),
 		views.NewRowView(

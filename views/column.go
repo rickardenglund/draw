@@ -27,9 +27,6 @@ func (c *ColumnView) Draw(target rl.Rectangle) {
 	for i := range c.objs {
 		p := rl.Vector2Add(pos, rl.Vector2Scale(offset, float32(i)))
 
-		//rect := rl.NewRectangle(p.X, p.Y, partSize.X, partSize.Y)
-		//rl.DrawRectangleLinesEx(rect, 2, rl.White)
-
 		margin := float32(0)
 		pInBorder := rl.Vector2Add(p, rl.NewVector2(margin, margin))
 		sizeInBorder := rl.Vector2Subtract(partSize, rl.NewVector2(margin*2, margin*2))
