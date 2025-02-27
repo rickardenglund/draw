@@ -49,7 +49,7 @@ func (c *Circle) Draw(target rl.Rectangle) {
 	}
 
 	now := float32(rl.GetTime() - c.animStart)
-	dur := float32(1.0)
+	dur := float32(.2)
 	r := ea.QuadIn(now, c.prevRad, c.radius-c.prevRad, dur)
 	if now > dur {
 		r = c.radius

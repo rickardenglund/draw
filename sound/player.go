@@ -79,11 +79,15 @@ func (p *Player) Draw(target rl.Rectangle) {
 
 		if rl.IsMouseButtonPressed(rl.MouseButtonLeft) &&
 			rl.CheckCollisionPointRec(mp, target) {
-			if !rl.IsSoundPlaying(p.sound) {
-				p.loadAudio()
-				rl.PlaySound(p.sound)
-			}
+			p.Play()
 		}
+	}
+}
+
+func (p *Player) Play() {
+	if !rl.IsSoundPlaying(p.sound) {
+		p.loadAudio()
+		rl.PlaySound(p.sound)
 	}
 }
 

@@ -3,6 +3,7 @@ package main
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 
+	"github.com/rickardenglund/draw/data"
 	"github.com/rickardenglund/draw/draw"
 	"github.com/rickardenglund/draw/plot"
 	"github.com/rickardenglund/draw/shapes"
@@ -13,8 +14,8 @@ import (
 )
 
 func main() {
-	d := newData()
-	d.update()
+	d := data.NewData()
+	d.Update()
 
 	myC := shapes.NewCircle(20, theme.Muave)
 	r := float32(10)
@@ -27,20 +28,26 @@ func main() {
 		myC.Set(r)
 	}
 
+	player := sound.NewPlayer(d.GetTWF)
+
+	update := func() {
+		d.Update()
+		player.Play()
+	}
 	v := views.NewColumnView(
 		views.NewRowView(
-			plot.NewPlot(d.getSP),
+			plot.NewPlot(d.GetSP),
 			views.NewColumnView(
 				views.NewRowView(
-					widget.NewButton("Update Plot", d.update),
+					widget.NewButton("Update Plot", update),
 					widget.NewButton("New Size", f),
 					myC,
 				),
-				sound.NewPlayer(d.getTWF),
+				player,
 			),
 		),
 		views.NewRowView(
-			plot.NewPlot(d.getTWF),
+			plot.NewPlot(d.GetTWF),
 		),
 	)
 

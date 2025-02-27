@@ -1,4 +1,4 @@
-package main
+package data
 
 import (
 	"math"
@@ -10,7 +10,7 @@ import (
 	"github.com/mjibson/go-dsp/fft"
 )
 
-type data struct {
+type Data struct {
 	tw      []rl.Vector2
 	sp      []rl.Vector2
 	prevTW  []rl.Vector2
@@ -18,16 +18,20 @@ type data struct {
 	prevSP  []rl.Vector2
 }
 
-func newData() *data {
-	return &data{
+func NewData() *Data {
+	return &Data{
 		tw:      []rl.Vector2{},
 		sp:      []rl.Vector2{},
 		updated: rl.GetTime(),
 	}
 }
 
-func (d *data) update() {
+func (d *Data) Update() {
 	wave := getSine()
+	d.Set(wave, 44100)
+}
+
+func (d *Data) Set(wave []rl.Vector2, sampleRate float32) {
 	ps := make([]float64, len(wave))
 
 	spectra := make([]rl.Vector2, len(wave)/2)
@@ -35,7 +39,6 @@ func (d *data) update() {
 		ps[i] = float64(wave[i].Y)
 	}
 
-	sampleRate := float32(44100)
 	binSize := sampleRate / float32(len(ps))
 
 	polars := fft.FFTReal(ps)
@@ -67,12 +70,12 @@ func anim(old, cur []rl.Vector2, updated, dur float32) []rl.Vector2 {
 	return mod
 }
 
-func (d *data) getSP() []rl.Vector2 {
-	return anim(d.prevSP, d.sp, float32(d.updated), .2)
+func (d *Data) GetSP() []rl.Vector2 {
+	return anim(d.prevSP, d.sp, float32(d.updated), 1)
 }
 
-func (d *data) getTWF() []rl.Vector2 {
-	return anim(d.prevTW, d.tw, float32(d.updated), .2)
+func (d *Data) GetTWF() []rl.Vector2 {
+	return anim(d.prevTW, d.tw, float32(d.updated), 1)
 }
 
 func getSine() []rl.Vector2 {
@@ -98,11 +101,11 @@ func getSine() []rl.Vector2 {
 		}
 	}
 
-	n := 44100 / 1 //64
+	n := 44100 / 64
 	ps := make([]rl.Vector2, n)
 	for i := range n {
 		t := float64(i) * dt
-		v := float64(0)
+		v := float64(100) * 0
 		for _, f := range fs {
 			v += f(t)
 		}

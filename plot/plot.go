@@ -5,6 +5,7 @@ import (
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 
+	"github.com/rickardenglund/draw/floating"
 	"github.com/rickardenglund/draw/theme"
 )
 
@@ -71,9 +72,11 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 		thickness = dt
 	}
 	for i := range screenPs {
-		z := rl.NewVector2(screenPs[i].X, origo.Y)
-		rl.DrawLineEx(z, screenPs[i], thickness, theme.Charcoal)
+		//z := rl.NewVector2(screenPs[i].X, origo.Y)
+		//rl.DrawLineEx(z, screenPs[i], thickness, theme.Charcoal)
+		rl.DrawCircleV(screenPs[i], thickness/2, theme.Charcoal)
 	}
+	rl.DrawLineStrip(screenPs, theme.Charcoal)
 
 	mp := rl.GetMousePosition()
 	ci, d := findClosest(screenPs, mp)
@@ -81,33 +84,11 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 		p := ps[ci]
 		fmtString := fmt.Sprintf("Y: %s\nX: %s", getFmt(0, p.Y), getFmt(0, p.X))
 		msg := fmt.Sprintf(fmtString, p.Y, p.X)
-		textArea(mp, msg)
+		floating.TextArea(mp, msg)
 		rl.DrawLineEx(mp, screenPs[ci], 1, theme.Charcoal)
 		rl.DrawCircleV(mp, 3, theme.Charcoal)
 		rl.DrawCircleV(screenPs[ci], 3, theme.Charcoal)
 	}
-}
-
-func textArea(mp rl.Vector2, msg string) {
-	fontSize := float32(20)
-	spacing := float32(0)
-	ms := rl.MeasureTextEx(theme.Font, msg, fontSize, spacing)
-
-	padding := float32(10)
-	paddedRect := rl.NewRectangle(mp.X-(ms.X+2*padding), mp.Y-ms.Y-2*padding, ms.X+2*padding, ms.Y+2*padding)
-	if paddedRect.Y < 0 {
-		paddedRect.Y = 0
-	}
-	if paddedRect.X < 0 {
-		paddedRect.X = 0
-	}
-
-	target := rl.NewVector2(paddedRect.X+padding, paddedRect.Y+padding)
-
-	rl.DrawRectangleRec(paddedRect, rl.ColorAlpha(theme.Nude, .8))
-	rl.DrawRectangleLinesEx(paddedRect, 2, rl.ColorAlpha(theme.Charcoal, .8))
-	rl.DrawTextEx(theme.Font, msg, target, fontSize, spacing, theme.Charcoal)
-
 }
 
 func findClosest(ps []rl.Vector2, mp rl.Vector2) (int, float32) {

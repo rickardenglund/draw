@@ -10,13 +10,13 @@ type ColumnView struct {
 	objs []draw.Drawable
 }
 
-func (c ColumnView) Init() {
+func (c *ColumnView) Init() {
 	for _, o := range c.objs {
 		o.Init()
 	}
 }
 
-func (c ColumnView) Draw(target rl.Rectangle) {
+func (c *ColumnView) Draw(target rl.Rectangle) {
 	pos := rl.NewVector2(target.X, target.Y)
 	size := rl.NewVector2(target.Width, target.Height)
 
@@ -39,6 +39,6 @@ func (c ColumnView) Draw(target rl.Rectangle) {
 	}
 }
 
-func NewColumnView(objs ...draw.Drawable) draw.Drawable {
-	return ColumnView{objs: objs}
+func NewColumnView(objs ...draw.Drawable) *ColumnView {
+	return &ColumnView{objs: objs}
 }

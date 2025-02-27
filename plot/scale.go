@@ -24,7 +24,7 @@ func newScale(ps []rl.Vector2, target rl.Rectangle) scale {
 
 func minmax(ps []rl.Vector2) (float32, float32, float32, float32) {
 	minX, maxX := math.MaxFloat32, -math.MaxFloat32
-	minY, maxY := 0.0, 0.0
+	minY, maxY := math.MaxFloat32, -math.MaxFloat32
 
 	for _, p := range ps {
 		minX = math.Min(minX, float64(p.X))
