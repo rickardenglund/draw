@@ -29,6 +29,7 @@ func main() {
 
 	v := views.NewColumnView(
 		views.NewRowView(
+			widget.NewButton("New Size", f),
 			plot.NewPlot(d.GetSP),
 			views.NewMultiColumnView(
 				views.MultiItem{Label: "Update", Full: widget.NewButton("Update Plot", d.Update)},

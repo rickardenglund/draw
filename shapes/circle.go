@@ -1,14 +1,14 @@
 package shapes
 
 import (
-	ea "github.com/gen2brain/raylib-go/easings"
 	rl "github.com/gen2brain/raylib-go/raylib"
 
+	"github.com/rickardenglund/draw/animated"
 	"github.com/rickardenglund/draw/theme"
 )
 
 type Circle struct {
-	radius    float32
+	radius    *animated.Animated
 	clr       rl.Color
 	prevRad   float32
 	animStart float64
@@ -16,7 +16,7 @@ type Circle struct {
 
 func NewCircle(radius float32, clr rl.Color) *Circle {
 	return &Circle{
-		radius:    radius,
+		radius:    animated.NewAnimated(radius, 1),
 		clr:       clr,
 		prevRad:   0,
 		animStart: rl.GetTime(),
@@ -24,9 +24,7 @@ func NewCircle(radius float32, clr rl.Color) *Circle {
 }
 
 func (c *Circle) Set(newR float32) {
-	c.prevRad = c.radius
-	c.radius = newR
-	c.animStart = rl.GetTime()
+	c.radius.Set(newR)
 }
 
 func (c *Circle) Draw(target rl.Rectangle) {
@@ -36,20 +34,14 @@ func (c *Circle) Draw(target rl.Rectangle) {
 	p := rl.Vector2Add(pos, rl.Vector2Scale(size, .5))
 
 	clr := c.clr
-	if rl.CheckCollisionPointCircle(mp, p, c.radius) {
+	r := c.radius.Get()
+	if rl.CheckCollisionPointCircle(mp, p, r) {
 		clr = rl.Color{
 			R: 255 - c.clr.R,
 			G: 255 - c.clr.G,
 			B: 255 - c.clr.B,
 			A: c.clr.A,
 		}
-	}
-
-	now := float32(rl.GetTime() - c.animStart)
-	dur := float32(.2)
-	r := ea.QuadIn(now, c.prevRad, c.radius-c.prevRad, dur)
-	if now > dur {
-		r = c.radius
 	}
 
 	rl.DrawCircleV(p, r, clr)

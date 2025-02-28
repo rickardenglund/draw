@@ -63,7 +63,7 @@ func anim(old, cur []rl.Vector2, updated, dur float32) []rl.Vector2 {
 
 	mod := make([]rl.Vector2, len(cur))
 	for i := range cur {
-		y := easings.QuadIn(float32(now-updated), old[i].Y, cur[i].Y-old[i].Y, dur)
+		y := easings.LinearOut(float32(now-updated), old[i].Y, cur[i].Y-old[i].Y, dur)
 		mod[i] = rl.NewVector2(cur[i].X, y)
 	}
 
@@ -71,11 +71,11 @@ func anim(old, cur []rl.Vector2, updated, dur float32) []rl.Vector2 {
 }
 
 func (d *Data) GetSP() []rl.Vector2 {
-	return anim(d.prevSP, d.sp, float32(d.updated), 1)
+	return anim(d.prevSP, d.sp, float32(d.updated), .5)
 }
 
 func (d *Data) GetTWF() []rl.Vector2 {
-	return anim(d.prevTW, d.tw, float32(d.updated), 1)
+	return anim(d.prevTW, d.tw, float32(d.updated), .5)
 }
 
 func getSine() []rl.Vector2 {
