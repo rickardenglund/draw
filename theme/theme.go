@@ -40,3 +40,13 @@ func DrawTextPad(s string, p rl.Vector2, clr rl.Color) {
 	p = rl.Vector2Add(p, pad)
 	DrawText(s, p, clr)
 }
+
+func Pad(r rl.Rectangle) rl.Rectangle {
+	return rl.NewRectangle(
+		r.X+pad.X,
+		r.Y+pad.Y,
+		r.Width-2*pad.X,
+		r.Height-2*pad.Y,
+	)
+
+}

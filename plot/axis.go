@@ -50,28 +50,31 @@ func xTick(target rl.Rectangle, s scale, x float32, format string) {
 
 func drawAxisY(target rl.Rectangle, s scale) {
 	w := theme.MeaureTextPad(fmt.Sprintf(getFmt(s.l.minY, s.l.maxY), s.l.maxY))
-	target.Width = w.X
 	rl.DrawLineEx(rl.NewVector2(target.X+target.Width, target.Y), rl.NewVector2(target.X+target.Width, target.Y+target.Height), 2, theme.Salmon)
 
 	format := getFmt(s.l.minY, s.l.maxY)
 	n := int(math.Floor(float64(target.Height / w.Y)))
 	dy := (s.l.maxY - s.l.minY) / float32(n)
 	for i := range n {
-		tick(target, s, s.l.minY+float32(i)*dy, format)
+		tickY(target, s, s.l.minY+float32(i)*dy, format)
 	}
 }
 
-func tick(target rl.Rectangle, s scale, y float32, format string) {
-	tickWidth := target.Width / 4
+func tickY(target rl.Rectangle, s scale, y float32, format string) {
+	tickWidth := float32(3)
 
-	p := s.transform(rl.NewVector2(0, y))
+	tickPos := s.transform(rl.NewVector2(0, y))
+	tickPos.X = target.X + target.Width
+	screenY := tickPos.Y
 
-	p.X = target.X + target.Width - tickWidth/2
-	p2 := rl.Vector2Add(p, rl.NewVector2(tickWidth, 0))
-	rl.DrawLineEx(p, p2, 1.5, theme.Charcoal)
+	p0 := rl.Vector2Add(tickPos, rl.NewVector2(-tickWidth, 0))
+	p1 := rl.Vector2Add(tickPos, rl.NewVector2(tickWidth, 0))
+	rl.DrawLineEx(p0, p1, 1.5, theme.Charcoal)
 
 	text := fmt.Sprintf(format, y)
-	m := theme.MeaureTextPad(text)
-	p = rl.Vector2Add(p, rl.NewVector2(-m.X-3, -m.Y/2))
-	theme.DrawTextPad(text, p, theme.Charcoal)
+	ms := theme.MeaureTextPad(text)
+
+	textPos := rl.NewVector2(target.X, screenY-ms.Y/2)
+	textPos.X = target.X
+	theme.DrawTextPad(text, textPos, theme.Charcoal)
 }

@@ -15,16 +15,23 @@ type MultiColumnView struct {
 }
 
 func (c *MultiColumnView) Draw(target rl.Rectangle) {
+	if len(c.objs) == 0 {
+		return
+	}
+
 	c.handleKeys(target)
 
 	panelWidth := float32(0)
 
 	markerRadius := float32(5)
 	panelPartSize := target.Height / float32(len(c.objs))
-	mawrkerPos := rl.NewVector2(target.X+markerRadius, c.markerY.Get()*panelPartSize+panelPartSize/2)
+	mawrkerPos := rl.NewVector2(
+		target.X+markerRadius,
+		target.Y+c.markerY.Get()*panelPartSize+panelPartSize/2,
+	)
 
 	for i, o := range c.objs {
-		y := panelPartSize*float32(i) + panelPartSize/2
+		y := target.Y + panelPartSize*float32(i) + panelPartSize/2
 		p := rl.NewVector2(target.X+markerRadius, y)
 		fontsize := float32(20)
 		spacing := float32(0.5)
@@ -58,6 +65,10 @@ func (c *MultiColumnView) handleKeys(target rl.Rectangle) {
 		c.markerY.Set(float32(c.active))
 	}
 
+}
+
+func (c *MultiColumnView) Add(i MultiItem) {
+	c.objs = append(c.objs, i)
 }
 
 type MultiItem struct {

@@ -22,23 +22,15 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 	ls := minmax(ps)
 	YTickSize := theme.MeaureTextPad(fmt.Sprintf(getFmt(ls.minY, ls.maxY), ls.maxY))
 	XTickSize := theme.MeaureTextPad(fmt.Sprintf(getFmt(ls.minX, ls.maxX), ls.maxX))
-
-	margin := float32(10)
-	targetPlot := rl.NewRectangle(
-		targetWidget.X+margin,
-		targetWidget.Y+margin,
-		targetWidget.Width-2*margin,
-		targetWidget.Height-2*margin,
-	)
+	targetPlot := theme.Pad(targetWidget)
 
 	yAxisWidth := YTickSize.X
 	xAxisHeight := float32(XTickSize.Y)
-	targetYAxis := rl.NewRectangle(
-		targetPlot.X,
-		targetPlot.Y,
-		yAxisWidth,
-		targetPlot.Height,
-	)
+
+	targetYAxis := targetPlot
+	targetYAxis.Width = yAxisWidth
+	targetYAxis.Height -= xAxisHeight
+
 	targetXAxis := rl.NewRectangle(
 		targetYAxis.X+yAxisWidth,
 		targetPlot.Y+targetPlot.Height-xAxisHeight,
