@@ -2,6 +2,7 @@ package plot
 
 import (
 	"fmt"
+	"math"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 
@@ -9,11 +10,11 @@ import (
 )
 
 func drawAxisX(target rl.Rectangle, s scale) {
-	//rl.DrawRectangleRec(target, theme.Muave)
-	n := 5
-	dx := (s.maxX - s.minX) / float32(n)
+	w := theme.MeaureTextPad(fmt.Sprintf(getFmt(s.l.minX, s.l.maxX), s.l.maxX))
+	n := int(math.Floor(float64(target.Width / w.X)))
+	dx := (s.l.maxX - s.l.minX) / float32(n)
 	for i := range n {
-		xTick(target, s, s.minX+float32(i)*dx, getFmt(s.minX, s.maxX))
+		xTick(target, s, s.l.minX+float32(i)*dx, getFmt(s.l.minX, s.l.maxX))
 	}
 }
 
@@ -37,28 +38,27 @@ func getFmt(minV, maxV float32) string {
 
 func xTick(target rl.Rectangle, s scale, x float32, format string) {
 	sp := s.transform(rl.NewVector2(x, 0))
-	sp.Y = target.Y
-	rl.DrawCircleV(sp, 3, theme.Salmon)
+	rad := float32(3)
+	sp.Y = target.Y + rad
+	rl.DrawCircleV(sp, rad, theme.Salmon)
 	text := fmt.Sprintf(format, x)
-	fontSize := float32(14)
-	spacing := float32(.5)
 
-	m := rl.MeasureTextEx(theme.Font, text, fontSize, spacing)
+	m := theme.MeaureTextPad(text)
 	tp := rl.Vector2Add(sp, rl.NewVector2(-(m.X/2), 3))
-	rl.DrawTextEx(theme.Font, text, tp, fontSize, spacing, theme.Charcoal)
+	theme.DrawTextPad(text, tp, theme.Charcoal)
 }
-func drawAxisY(target rl.Rectangle, s scale) {
-	//rl.DrawRectangleRec(target, theme.Muave)
 
+func drawAxisY(target rl.Rectangle, s scale) {
+	w := theme.MeaureTextPad(fmt.Sprintf(getFmt(s.l.minY, s.l.maxY), s.l.maxY))
+	target.Width = w.X
 	rl.DrawLineEx(rl.NewVector2(target.X+target.Width, target.Y), rl.NewVector2(target.X+target.Width, target.Y+target.Height), 2, theme.Salmon)
 
-	format := getFmt(s.minY, s.maxY)
-	n := 5
-	dy := (s.maxY - s.minY) / float32(n)
+	format := getFmt(s.l.minY, s.l.maxY)
+	n := int(math.Floor(float64(target.Height / w.Y)))
+	dy := (s.l.maxY - s.l.minY) / float32(n)
 	for i := range n {
-		tick(target, s, s.minY+float32(i)*dy, format)
+		tick(target, s, s.l.minY+float32(i)*dy, format)
 	}
-
 }
 
 func tick(target rl.Rectangle, s scale, y float32, format string) {
@@ -71,9 +71,7 @@ func tick(target rl.Rectangle, s scale, y float32, format string) {
 	rl.DrawLineEx(p, p2, 1.5, theme.Charcoal)
 
 	text := fmt.Sprintf(format, y)
-	fontSize := float32(14)
-	spacing := float32(.5)
-	m := rl.MeasureTextEx(theme.Font, text, fontSize, spacing)
+	m := theme.MeaureTextPad(text)
 	p = rl.Vector2Add(p, rl.NewVector2(-m.X-3, -m.Y/2))
-	rl.DrawTextEx(theme.Font, text, p, fontSize, spacing, theme.Charcoal)
+	theme.DrawTextPad(text, p, theme.Charcoal)
 }

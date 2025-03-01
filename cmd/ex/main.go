@@ -42,5 +42,5 @@ func main() {
 		),
 	)
 
-	draw.NewWindow(rl.NewVector2(900, 550), v)
+	draw.NewWindow(rl.NewVector2(900, 550), func() {}, v)
 }

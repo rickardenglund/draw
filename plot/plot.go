@@ -14,6 +14,15 @@ type Plot struct {
 }
 
 func (p *Plot) Draw(targetWidget rl.Rectangle) {
+	ps := p.getPs()
+	if len(ps) < 2 {
+		return
+	}
+
+	ls := minmax(ps)
+	YTickSize := theme.MeaureTextPad(fmt.Sprintf(getFmt(ls.minY, ls.maxY), ls.maxY))
+	XTickSize := theme.MeaureTextPad(fmt.Sprintf(getFmt(ls.minX, ls.maxX), ls.maxX))
+
 	margin := float32(10)
 	targetPlot := rl.NewRectangle(
 		targetWidget.X+margin,
@@ -22,33 +31,27 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 		targetWidget.Height-2*margin,
 	)
 
-	axisWidth := float32(20)
-	axisHeight := float32(20)
+	yAxisWidth := YTickSize.X
+	xAxisHeight := float32(XTickSize.Y)
 	targetYAxis := rl.NewRectangle(
 		targetPlot.X,
 		targetPlot.Y,
-		axisWidth,
+		yAxisWidth,
 		targetPlot.Height,
 	)
 	targetXAxis := rl.NewRectangle(
-		targetYAxis.X+axisWidth,
-		targetPlot.Y+targetPlot.Height-axisHeight,
-		targetPlot.Width-axisWidth,
-		axisHeight,
-
+		targetYAxis.X+yAxisWidth,
+		targetPlot.Y+targetPlot.Height-xAxisHeight,
+		targetPlot.Width-yAxisWidth,
+		xAxisHeight,
 	)
 
 	targetData := rl.NewRectangle(
-		targetPlot.X+axisWidth,
+		targetPlot.X+yAxisWidth,
 		targetPlot.Y,
-		targetPlot.Width-axisWidth,
-		targetPlot.Height-axisHeight,
+		targetPlot.Width-yAxisWidth,
+		targetPlot.Height-xAxisHeight,
 	)
-
-	ps := p.getPs()
-	if len(ps) < 2 {
-		return
-	}
 
 	s := newScale(ps, targetData)
 	drawAxisY(targetYAxis, s)
@@ -63,15 +66,15 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 	origo := s.transform(rl.Vector2{})
 	o1 := rl.NewVector2(screenPs[0].X, origo.Y)
 	o2 := rl.NewVector2(o1.X+targetData.Width, o1.Y)
-	rl.DrawLineEx(o1, o2, 2, theme.Salmon)
+	if rl.CheckCollisionPointRec(o1, targetData) {
+		rl.DrawLineEx(o1, o2, 2, theme.Salmon)
+	}
 	dt := screenPs[1].X - screenPs[0].X
 	thickness := float32(2)
 	if dt < thickness && dt > 1 {
 		thickness = dt
 	}
 	for i := range screenPs {
-		//z := rl.NewVector2(screenPs[i].X, origo.Y)
-		//rl.DrawLineEx(z, screenPs[i], thickness, theme.Charcoal)
 		rl.DrawCircleV(screenPs[i], thickness/2, theme.Charcoal)
 	}
 	rl.DrawLineStrip(screenPs, theme.Charcoal)

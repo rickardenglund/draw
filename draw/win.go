@@ -6,7 +6,7 @@ import (
 	"github.com/rickardenglund/draw/theme"
 )
 
-func NewWindow(size rl.Vector2, objs ...Drawable) {
+func NewWindow(size rl.Vector2, init func(), objs ...Drawable) {
 	rl.SetTraceLogLevel(rl.LogWarning)
 	rl.InitWindow(int32(size.X), int32(size.Y), "Super Window")
 	theme.Font = rl.GetFontDefault()
@@ -18,6 +18,7 @@ func NewWindow(size rl.Vector2, objs ...Drawable) {
 	rl.InitAudioDevice()
 	defer rl.CloseAudioDevice()
 
+	init()
 	for !rl.WindowShouldClose() {
 		rl.BeginDrawing()
 		rl.ClearBackground(theme.Nude)
