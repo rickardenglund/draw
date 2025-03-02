@@ -14,6 +14,10 @@ type MultiColumnView struct {
 	markerY *animated.Animated
 }
 
+func (c MultiColumnView) GetSize(target rl.Rectangle) rl.Vector2 {
+	return rl.NewVector2(target.X, target.Y)
+}
+
 func (c *MultiColumnView) Draw(target rl.Rectangle) {
 	if len(c.objs) == 0 {
 		return
@@ -21,7 +25,7 @@ func (c *MultiColumnView) Draw(target rl.Rectangle) {
 
 	c.handleKeys(target)
 
-	panelWidth := float32(0)
+	panelWidth := float32(10)
 
 	markerRadius := float32(5)
 	panelPartSize := target.Height / float32(len(c.objs))
@@ -33,16 +37,11 @@ func (c *MultiColumnView) Draw(target rl.Rectangle) {
 	for i, o := range c.objs {
 		y := target.Y + panelPartSize*float32(i) + panelPartSize/2
 		p := rl.NewVector2(target.X+markerRadius, y)
-		fontsize := float32(20)
-		spacing := float32(0.5)
+		labelSize := o.Label.GetSize(target)
+		labelRect := rl.NewRectangle(p.X, p.Y-labelSize.Y/2, labelSize.X, labelSize.Y)
+		o.Label.Draw(labelRect)
 
-		label := o.Label
-		ms := rl.MeasureTextEx(theme.Font, label, fontsize, spacing)
-		textPos := rl.NewVector2(p.X+markerRadius, p.Y-ms.Y/2)
-		rl.DrawTextEx(theme.Font, label, textPos, fontsize, spacing, theme.Charcoal)
-
-		panelWidth = max(panelWidth, ms.X+2*markerRadius)
-
+		panelWidth = max(panelWidth, labelSize.X+2*markerRadius)
 	}
 
 	rl.DrawCircleV(mawrkerPos, markerRadius, theme.Charcoal)
@@ -72,7 +71,7 @@ func (c *MultiColumnView) Add(i MultiItem) {
 }
 
 type MultiItem struct {
-	Label string
+	Label draw.Drawable
 	Full  draw.Drawable
 }
 

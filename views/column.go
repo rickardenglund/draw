@@ -10,6 +10,10 @@ type ColumnView struct {
 	objs []draw.Drawable
 }
 
+func (c *ColumnView) GetSize(target rl.Rectangle) rl.Vector2 {
+	return rl.NewVector2(target.X, target.Y)
+}
+
 func (c *ColumnView) Draw(target rl.Rectangle) {
 	pos := rl.NewVector2(target.X, target.Y)
 	size := rl.NewVector2(target.Width, target.Height)

@@ -15,6 +15,10 @@ type Text struct {
 	s string
 }
 
+func (t Text) GetSize(target rl.Rectangle) rl.Vector2 {
+	return theme.MeaureTextPad(t.s)
+}
+
 func (t Text) Draw(target rl.Rectangle) {
 	p := rl.NewVector2(target.X, target.Y)
 	theme.DrawTextPad(t.s, p, theme.Charcoal)

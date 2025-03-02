@@ -13,6 +13,10 @@ type Plot struct {
 	getPs func() []rl.Vector2
 }
 
+func (p Plot) GetSize(target rl.Rectangle) rl.Vector2 {
+	return rl.NewVector2(target.X, target.Y)
+}
+
 func (p *Plot) Draw(targetWidget rl.Rectangle) {
 	ps := p.getPs()
 	if len(ps) < 2 {

@@ -6,4 +6,5 @@ import (
 
 type Drawable interface {
 	Draw(target rl.Rectangle)
+	GetSize(rectangle rl.Rectangle) rl.Vector2
 }

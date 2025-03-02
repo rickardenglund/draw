@@ -27,6 +27,10 @@ func (c *Circle) Set(newR float32) {
 	c.radius.Set(newR)
 }
 
+func (c Circle) GetSize(target rl.Rectangle) rl.Vector2 {
+	return rl.NewVector2(c.radius.Get()*2, c.radius.Get()*2)
+}
+
 func (c *Circle) Draw(target rl.Rectangle) {
 	pos := rl.NewVector2(target.X, target.Y)
 	size := rl.NewVector2(target.Width, target.Height)

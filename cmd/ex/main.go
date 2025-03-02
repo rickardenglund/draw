@@ -31,15 +31,15 @@ func main() {
 	v := views.NewColumnView(
 		views.NewRowView(
 			views.NewMultiRowView(
-				views.MultiItem{"muave", shapes.NewSquare(rl.NewVector2(50, 30), theme.Muave)},
-				views.MultiItem{"salmon", shapes.NewSquare(rl.NewVector2(20, 50), theme.Salmon)},
-				views.MultiItem{"green", shapes.NewSquare(rl.NewVector2(20, 50), rl.Green)},
+				views.MultiItem{text.NewTextf("Muave"), shapes.NewSquare(rl.NewVector2(50, 30), theme.Muave)},
+				views.MultiItem{text.NewTextf("Salmon"), shapes.NewSquare(rl.NewVector2(20, 50), theme.Salmon)},
+				views.MultiItem{text.NewTextf("Green"), shapes.NewSquare(rl.NewVector2(20, 50), rl.Green)},
 			),
 			plot.NewPlot(d.GetSP),
 			views.NewMultiColumnView(
-				views.MultiItem{Label: "Update", Full: widget.NewButton("Update Plot", d.Update)},
-				views.MultiItem{Label: "size", Full: widget.NewButton("New Size", f)},
-				views.MultiItem{Label: "shape", Full: myC},
+				views.MultiItem{Label: text.NewTextf("update"), Full: widget.NewButton("Update Plot", d.Update)},
+				views.MultiItem{Label: text.NewTextf("size"), Full: widget.NewButton("New Size", f)},
+				views.MultiItem{Label: text.NewTextf("myC"), Full: myC},
 			),
 			views.NewColumnView(
 				text.NewTextf("hejsan: %d", 5),

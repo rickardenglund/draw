@@ -8,11 +8,17 @@ import (
 
 type RowView struct {
 	objs []draw.Drawable
+	dir  []rl.Vector2
+}
+
+func (r RowView) GetSize(target rl.Rectangle) rl.Vector2 {
+	return rl.NewVector2(target.X, target.Y)
 }
 
 func (r RowView) Draw(target rl.Rectangle) {
 	pos := rl.NewVector2(target.X, target.Y)
 	size := rl.NewVector2(target.Width, target.Height)
+
 	dx := size.X / float32(len(r.objs))
 	partSize := rl.NewVector2(dx, size.Y)
 	offset := rl.NewVector2(partSize.X, 0)

@@ -13,6 +13,10 @@ func NewSquare(size rl.Vector2, clr rl.Color) Square {
 	return Square{size: size, clr: clr}
 }
 
+func (s Square) GetSize(target rl.Rectangle) rl.Vector2 {
+	return s.size
+}
+
 func (s Square) Draw(target rl.Rectangle) {
 	targetPos := rl.NewVector2(target.X, target.Y)
 	targetSize := rl.NewVector2(target.Width, target.Height)

@@ -12,6 +12,10 @@ type Button struct {
 	title  string
 }
 
+func (b Button) GetSize(target rl.Rectangle) rl.Vector2 {
+	return theme.MeaureTextPad(b.title)
+}
+
 func (b *Button) Draw(target rl.Rectangle) {
 	fontSize := float32(14)
 	spacing := float32(.5)
