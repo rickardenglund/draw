@@ -4,7 +4,6 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 
 	"github.com/rickardenglund/draw/draw"
-	"github.com/rickardenglund/draw/theme"
 )
 
 type RowView struct {
@@ -20,9 +19,6 @@ func (r RowView) Draw(target rl.Rectangle) {
 
 	for i := range r.objs {
 		p := rl.Vector2Add(pos, rl.Vector2Scale(offset, float32(i)))
-
-		rect := rl.NewRectangle(p.X, p.Y, partSize.X, partSize.Y)
-		rl.DrawRectangleLinesEx(rect, 2, rl.ColorAlpha(theme.Charcoal, .5))
 
 		margin := float32(0)
 		pInBorder := rl.Vector2Add(p, rl.NewVector2(margin, margin))

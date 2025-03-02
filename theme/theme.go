@@ -19,7 +19,7 @@ var (
 	Nude     = rl.NewColor(227, 188, 154, 255)
 	Font     = rl.GetFontDefault()
 	FontSize = float32(20)
-	Spacing  = float32(.5)
+	Spacing  = float32(.0)
 	pad      = rl.NewVector2(5, 5)
 )
 
