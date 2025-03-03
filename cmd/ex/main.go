@@ -27,7 +27,7 @@ func main() {
 
 		myC.Set(r)
 	}
-
+	b := text.NewBlinkablef("hejsan: %d", 5)
 	v := views.NewColumnView(
 		views.NewRowView(
 			views.NewMultiRowView(
@@ -42,7 +42,8 @@ func main() {
 				views.MultiItem{Label: text.NewTextf("myC"), Full: myC},
 			),
 			views.NewColumnView(
-				text.NewTextf("hejsan: %d", 5),
+				widget.NewButton("blink", b.Blink),
+				b,
 				text.NewTextf("hoppsan"),
 				text.NewTextf("Kalle kanin\när 🐇"),
 			),
