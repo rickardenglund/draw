@@ -14,7 +14,7 @@ type Plot struct {
 }
 
 func (p Plot) GetSize(target rl.Rectangle) rl.Vector2 {
-	return rl.NewVector2(target.X, target.Y)
+	return rl.NewVector2(target.Width, target.Height)
 }
 
 func (p *Plot) Draw(targetWidget rl.Rectangle) {

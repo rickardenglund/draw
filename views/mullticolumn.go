@@ -15,7 +15,7 @@ type MultiColumnView struct {
 }
 
 func (c MultiColumnView) GetSize(target rl.Rectangle) rl.Vector2 {
-	return rl.NewVector2(target.X, target.Y)
+	return rl.NewVector2(target.Width, target.Height)
 }
 
 func (c *MultiColumnView) Draw(target rl.Rectangle) {
@@ -29,11 +29,7 @@ func (c *MultiColumnView) Draw(target rl.Rectangle) {
 
 	markerRadius := float32(5)
 	panelPartSize := target.Height / float32(len(c.objs))
-	mawrkerPos := rl.NewVector2(
-		target.X+markerRadius,
-		target.Y+c.markerY.Get()*panelPartSize+panelPartSize/2,
-	)
-
+	var mp1Y, mp2Y float32
 	for i, o := range c.objs {
 		y := target.Y + panelPartSize*float32(i) + panelPartSize/2
 		p := rl.NewVector2(target.X+markerRadius, y)
@@ -42,9 +38,26 @@ func (c *MultiColumnView) Draw(target rl.Rectangle) {
 		o.Label.Draw(labelRect)
 
 		panelWidth = max(panelWidth, labelSize.X+2*markerRadius)
+		if i == c.active {
+			mp1Y = target.Y + panelPartSize*c.markerY.Get() + .5*panelPartSize - .5*labelSize.Y
+			mp2Y = target.Y + panelPartSize*c.markerY.Get() + .5*panelPartSize + .5*labelSize.Y
+
+		}
 	}
 
-	rl.DrawCircleV(mawrkerPos, markerRadius, theme.Charcoal)
+	mpX := target.X + panelWidth
+	mp0 := rl.NewVector2(mpX, target.Y)
+	mp1 := rl.NewVector2(mpX, mp1Y)
+	mp1Left := rl.NewVector2(target.X, mp1Y)
+	mp2Left := rl.NewVector2(target.X, mp2Y)
+	mp2 := rl.NewVector2(mpX, mp2Y)
+	mp3 := rl.NewVector2(target.X+panelWidth, target.Y+target.Height)
+
+	rl.DrawLineEx(mp0, mp1, 2, theme.Charcoal)
+	rl.DrawLineEx(mp1, mp1Left, 2, theme.Charcoal)
+	rl.DrawLineEx(mp1Left, mp2Left, 2, theme.Charcoal)
+	rl.DrawLineEx(mp2Left, mp2, 2, theme.Charcoal)
+	rl.DrawLineEx(mp2, mp3, 2, theme.Charcoal)
 
 	mainTarget := rl.NewRectangle(target.X+panelWidth, target.Y, target.Width-panelWidth, target.Height)
 	c.objs[c.active].Full.Draw(mainTarget)
