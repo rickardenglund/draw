@@ -64,12 +64,12 @@ func (c *MultiColumnView) Draw(target rl.Rectangle) {
 }
 
 func (c *MultiColumnView) handleKeys(target rl.Rectangle) {
-	if rl.IsKeyPressed(rl.KeyJ) {
+	if rl.IsKeyPressed(rl.KeyJ) || rl.IsKeyPressedRepeat(rl.KeyDown) {
 		c.active = (c.active + 1) % len(c.objs)
 		c.markerY.Set(float32(c.active))
 	}
 
-	if rl.IsKeyPressed(rl.KeyK) {
+	if rl.IsKeyPressed(rl.KeyK) || rl.IsKeyPressedRepeat(rl.KeyUp) {
 		c.active -= 1
 		if c.active < 0 {
 			c.active = len(c.objs) - 1
@@ -81,6 +81,27 @@ func (c *MultiColumnView) handleKeys(target rl.Rectangle) {
 
 func (c *MultiColumnView) Add(i MultiItem) {
 	c.objs = append(c.objs, i)
+}
+
+func (c *MultiColumnView) Clear() {
+	c.objs = []MultiItem{}
+	c.active = 0
+	c.markerY.Set(0)
+}
+
+func (c *MultiColumnView) GetActive() int {
+	return c.active
+}
+
+func (c *MultiColumnView) SetActive(a int) {
+	if a >= len(c.objs) {
+		c.active = len(c.objs) - 1
+		c.markerY.SetForce(float32(c.active))
+		return
+	}
+
+	c.active = max(a, 0)
+	c.markerY.SetForce(float32(c.active))
 }
 
 type MultiItem struct {

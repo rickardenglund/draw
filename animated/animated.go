@@ -34,3 +34,8 @@ func (a *Animated) Get() float32 {
 	}
 	return easings.LinearOut(t, a.prev, a.cur-a.prev, a.dur)
 }
+
+func (a *Animated) SetForce(f float32) {
+	a.Set(f)
+	a.prev = f
+}

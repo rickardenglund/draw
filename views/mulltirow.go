@@ -55,12 +55,12 @@ func (r *MultiRowView) Draw(target rl.Rectangle) {
 }
 
 func (r *MultiRowView) handleKeys(target rl.Rectangle) {
-	if rl.IsKeyPressed(rl.KeyL) {
+	if rl.IsKeyPressed(rl.KeyL) || rl.IsKeyPressedRepeat(rl.KeyRight) {
 		r.active = (r.active + 1) % len(r.objs)
 		r.markerX.Set(float32(r.active))
 	}
 
-	if rl.IsKeyPressed(rl.KeyH) {
+	if rl.IsKeyPressed(rl.KeyH) || rl.IsKeyPressed(rl.KeyLeft) {
 		r.active -= 1
 		if r.active < 0 {
 			r.active = len(r.objs) - 1
