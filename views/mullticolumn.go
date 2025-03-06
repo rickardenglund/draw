@@ -64,12 +64,12 @@ func (c *MultiColumnView) Draw(target rl.Rectangle) {
 }
 
 func (c *MultiColumnView) handleKeys(target rl.Rectangle) {
-	if rl.IsKeyPressed(rl.KeyJ) || rl.IsKeyPressedRepeat(rl.KeyDown) {
+	if rl.IsKeyPressed(rl.KeyJ) || rl.IsKeyPressed(rl.KeyDown) {
 		c.active = (c.active + 1) % len(c.objs)
 		c.markerY.Set(float32(c.active))
 	}
 
-	if rl.IsKeyPressed(rl.KeyK) || rl.IsKeyPressedRepeat(rl.KeyUp) {
+	if rl.IsKeyPressed(rl.KeyK) || rl.IsKeyPressed(rl.KeyUp) {
 		c.active -= 1
 		if c.active < 0 {
 			c.active = len(c.objs) - 1
