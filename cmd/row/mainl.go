@@ -16,7 +16,7 @@ func main() {
 			text.NewWrap("Hej jag heter Rickard vad heter du? Vilken är din favoritglass? Jag gillara jorggubbsglass! Men jag tycker också att det är fantastiskt med banan i glass"),
 			views.NewMultiRowView(
 				views.MultiItem{text.NewTextf("r1"), shapes.NewCircle(15, rl.Red)},
-				views.MultiItem{text.NewTextf("r2"), shapes.NewCircle(15, rl.Green)},
+				views.MultiItem{text.NewTextf("Kanin"), shapes.NewCircle(15, rl.Green)},
 				views.MultiItem{text.NewTextf("r4"), shapes.NewCircle(15, rl.Blue)},
 			),
 		),

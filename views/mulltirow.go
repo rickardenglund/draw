@@ -28,8 +28,10 @@ func (r *MultiRowView) Draw(target rl.Rectangle) {
 
 	panelPartSize := target.Width / float32(len(r.objs))
 
+	maxLabelSize := float32(0)
 	for i, o := range r.objs {
 		labelSize := o.Label.GetSize(target)
+		maxLabelSize = max(maxLabelSize, labelSize.X)
 		x := target.X + panelPartSize*float32(i) + panelPartSize/2 - labelSize.X/2
 		p := rl.NewVector2(x, target.Y)
 		labelTarget := rl.NewRectangle(p.X, p.Y, labelSize.X, labelSize.Y)
@@ -43,9 +45,10 @@ func (r *MultiRowView) Draw(target rl.Rectangle) {
 	mpHeight := rl.NewVector2(0, -panelHeight)
 	pleft := rl.NewVector2(mainTarget.X, mainTarget.Y)
 	pRight := rl.NewVector2(mainTarget.X+mainTarget.Width, mainTarget.Y)
-	mp0 := rl.NewVector2(target.X+r.markerX.Get()*panelPartSize, mainTarget.Y)
+	markerCenterX := target.X + (.5+r.markerX.Get())*panelPartSize
+	mp0 := rl.NewVector2(markerCenterX-.5*maxLabelSize, mainTarget.Y)
 	mp0U := rl.Vector2Add(mp0, mpHeight)
-	mp1 := rl.NewVector2(target.X+(r.markerX.Get()+1)*panelPartSize, mainTarget.Y)
+	mp1 := rl.NewVector2(markerCenterX+0.5*maxLabelSize, mainTarget.Y)
 	mp1U := rl.Vector2Add(mp1, mpHeight)
 	rl.DrawLineEx(pleft, mp0, 2, theme.Charcoal)
 	rl.DrawLineEx(mp0, mp0U, 2, theme.Charcoal)
