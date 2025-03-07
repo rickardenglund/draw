@@ -11,8 +11,7 @@ type scale struct {
 	l      limits
 }
 
-func newScale(ps []rl.Vector2, target rl.Rectangle) scale {
-	l := minmax(ps)
+func newScale(l limits, target rl.Rectangle) scale {
 	return scale{
 		target: target,
 		l:      l,
@@ -29,11 +28,11 @@ func minmax(ps []rl.Vector2) limits {
 	minY, maxY := math.MaxFloat32, -math.MaxFloat32
 
 	for _, p := range ps {
-		minX = math.Min(minX, float64(p.X))
-		maxX = math.Max(minX, float64(p.X))
+		minX = min(minX, float64(p.X))
+		maxX = max(maxX, float64(p.X))
 
-		minY = math.Min(minY, float64(p.Y))
-		maxY = math.Max(maxY, float64(p.Y))
+		minY = min(minY, float64(p.Y))
+		maxY = max(maxY, float64(p.Y))
 	}
 
 	return limits{

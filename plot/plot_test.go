@@ -35,7 +35,8 @@ func Test_transform(t *testing.T) {
 	}
 	for _, tt := range tt {
 		t.Run("", func(t *testing.T) {
-			s := newScale(tt.ps, tt.target)
+			ls := minmax(tt.ps)
+			s := newScale(ls, tt.target)
 			sp := s.transform(tt.p)
 			require.Equal(t, tt.want, sp)
 		})
@@ -89,11 +90,17 @@ func Test_minmax(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run("", func(t *testing.T) {
-			minx, maxX, minY, maxY := minmax(tt.ps)
-			require.Equal(t, tt.wantMinX, minx)
-			require.Equal(t, tt.wantMaxX, maxX)
-			require.Equal(t, tt.wantMinY, minY)
-			require.Equal(t, tt.wantMaxY, maxY)
+			ls := minmax(tt.ps)
+			require.Equal(t, tt.wantMinX, ls.minX)
+			require.Equal(t, tt.wantMaxX, ls.maxX)
+			require.Equal(t, tt.wantMinY, ls.minY)
+			require.Equal(t, tt.wantMaxY, ls.maxY)
 		})
 	}
+}
+
+func Test_extend(t *testing.T) {
+	got := extend([]int{1, 2, 3}, 6)
+	require.Equal(t, []int{1, 2, 3, 3, 3, 3}, got)
+
 }

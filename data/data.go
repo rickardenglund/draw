@@ -75,10 +75,11 @@ func (d *Data) GetSP() []rl.Vector2 {
 }
 
 func (d *Data) GetTWF() []rl.Vector2 {
-	return anim(d.prevTW, d.tw, float32(d.updated), .5)
+	return d.tw //anim(d.prevTW, d.tw, float32(d.updated), .5)
 }
 
 func getSine() []rl.Vector2 {
+	dc := rand.Float64() * 100
 	noiseLevel := float64(1)
 	sr := 44100.0
 	dt := 1.0 / sr
@@ -105,7 +106,7 @@ func getSine() []rl.Vector2 {
 	ps := make([]rl.Vector2, n)
 	for i := range n {
 		t := float64(i) * dt
-		v := float64(100)
+		v := float64(dc)
 		for _, f := range fs {
 			v += f(t)
 		}
