@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	rl "github.com/gen2brain/raylib-go/raylib"
 
 	"github.com/rickardenglund/draw/data"
@@ -64,7 +66,12 @@ func main() {
 		plt.Set(myShapes[currentShape])
 
 	}
-	b := text.NewBlinkablef("hejsan: %d", 5)
+	blinkables := []draw.Drawable{
+		text.NewBlinkablef("hejsan: %d", 1),
+		text.NewBlinkablef("hejsan: %d", 2),
+		text.NewBlinkablef("hejsan: %d", 3),
+		text.NewBlinkablef("hejsan: %d", 4),
+	}
 	v := views.NewColumnView(
 		views.NewRowView(
 			views.NewMultiRowView(
@@ -78,17 +85,13 @@ func main() {
 				views.MultiItem{Label: text.NewTextf("update"), Full: views.NewColumnView(
 					widget.NewButton("Update Plot", updatePlotsF),
 					widget.NewButton("Next Shape", nextShapeF),
+					widget.NewButton("blink", blink(blinkables)),
 
 				)},
 				views.MultiItem{Label: text.NewTextf("size"), Full: widget.NewButton("New Size", f)},
 				views.MultiItem{Label: text.NewTextf("myC"), Full: myC},
 			),
-			views.NewColumnView(
-				widget.NewButton("blink", b.Blink),
-				b,
-				text.NewTextf("hoppsan"),
-				text.NewTextf("Kalle kanin\när 🐇"),
-			),
+			views.NewColumnView(blinkables...),
 		),
 		views.NewRowView(
 			twf,
@@ -96,4 +99,22 @@ func main() {
 	)
 
 	draw.NewWindow(rl.NewVector2(900, 550), func() {}, v)
+}
+
+func blink(bs []draw.Drawable) func() {
+	return func() {
+		go func() {
+			for range 3 {
+				for i := range bs {
+					b, ok := bs[i].(*text.Blinkable)
+					if ok {
+						b.Blink()
+					}
+					time.Sleep(200 * time.Millisecond)
+				}
+			}
+		}()
+
+	}
+
 }

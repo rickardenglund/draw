@@ -5,24 +5,19 @@ import (
 	"math/cmplx"
 	"math/rand"
 
-	"github.com/gen2brain/raylib-go/easings"
 	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/mjibson/go-dsp/fft"
 )
 
 type Data struct {
-	tw      []rl.Vector2
-	sp      []rl.Vector2
-	prevTW  []rl.Vector2
-	updated float64
-	prevSP  []rl.Vector2
+	tw []rl.Vector2
+	sp []rl.Vector2
 }
 
 func NewData() *Data {
 	return &Data{
-		tw:      []rl.Vector2{},
-		sp:      []rl.Vector2{},
-		updated: rl.GetTime(),
+		tw: []rl.Vector2{},
+		sp: []rl.Vector2{},
 	}
 }
 
@@ -48,34 +43,16 @@ func (d *Data) Set(wave []rl.Vector2, sampleRate float32) {
 		spectra[i] = rl.NewVector2(f, float32(m))
 	}
 
-	d.prevTW = d.tw
-	d.updated = rl.GetTime()
 	d.tw = wave
-	d.prevSP = d.sp
 	d.sp = spectra
 }
 
-func anim(old, cur []rl.Vector2, updated, dur float32) []rl.Vector2 {
-	now := float32(rl.GetTime())
-	if now > updated+dur || len(old) != len(cur) {
-		return cur
-	}
-
-	mod := make([]rl.Vector2, len(cur))
-	for i := range cur {
-		y := easings.LinearOut(float32(now-updated), old[i].Y, cur[i].Y-old[i].Y, dur)
-		mod[i] = rl.NewVector2(cur[i].X, y)
-	}
-
-	return mod
-}
-
 func (d *Data) GetSP() []rl.Vector2 {
-	return anim(d.prevSP, d.sp, float32(d.updated), .5)
+	return d.sp
 }
 
 func (d *Data) GetTWF() []rl.Vector2 {
-	return d.tw //anim(d.prevTW, d.tw, float32(d.updated), .5)
+	return d.tw
 }
 
 func getSine() []rl.Vector2 {
