@@ -10,12 +10,14 @@ import (
 )
 
 type Plot struct {
-	cur          []rl.Vector2
-	prev         []rl.Vector2
-	updated      float64
-	curLimits    limits
-	prevLimits   limits
-	animDuration float64
+	cur           []rl.Vector2
+	prev          []rl.Vector2
+	psUpdated     float64
+	limitsUpdated float64
+	curLimits     limits
+	prevLimits    limits
+	animDuration  float64
+	selection     selection
 }
 
 func (p Plot) GetSize(target rl.Rectangle) rl.Vector2 {
@@ -57,6 +59,8 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 	)
 
 	s := newScale(ls, targetData)
+	p.handleKeys(targetData, s)
+
 	drawAxisY(targetYAxis, s)
 	drawAxisX(targetXAxis, s)
 
@@ -78,13 +82,26 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 		thickness = dt
 	}
 	for i := range screenPs {
-		rl.DrawCircleV(screenPs[i], thickness/2, theme.Charcoal)
+		sp := screenPs[i]
+		clr := theme.Charcoal
+		th := thickness / 2
+		if !rl.CheckCollisionPointRec(sp, targetData) {
+			sp = clamp(sp, targetData)
+			screenPs[i] = sp
+			clr = rl.Red
+			th *= 4
+		}
+		rl.DrawCircleV(sp, th, clr)
 	}
 	rl.DrawLineStrip(screenPs, theme.Charcoal)
 
+	if p.selection.IsActive() {
+		rl.DrawRectangleLinesEx(p.selection.GetRect(), 2, rl.ColorAlpha(rl.White, .5))
+	}
+
 	mp := rl.GetMousePosition()
 	ci, d := findClosest(screenPs, mp)
-	if d < 30 && rl.CheckCollisionPointRec(mp, targetWidget) {
+	if !p.selection.IsActive() && d < 30 && rl.CheckCollisionPointRec(mp, targetWidget) {
 		p := ps[ci]
 		fmtString := fmt.Sprintf("Y: %s\nX: %s", getFmt(0, p.Y), getFmt(0, p.X))
 		msg := fmt.Sprintf(fmtString, p.Y, p.X)
@@ -95,10 +112,19 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 	}
 }
 
+func clamp(p rl.Vector2, target rl.Rectangle) rl.Vector2 {
+	x := max(target.X, p.X)
+	x = min(x, target.X+target.Width)
+	y := max(target.Y, p.Y)
+	y = min(y, target.Y+target.Height)
+
+	return rl.NewVector2(x, y)
+}
+
 func (p *Plot) getPs() []rl.Vector2 {
 	var ps []rl.Vector2
 	now := rl.GetTime()
-	animTime := now - p.updated
+	animTime := now - p.psUpdated
 	if animTime > p.animDuration {
 		return p.cur
 	}
@@ -144,17 +170,22 @@ func extend[T any](short []T, n int) []T {
 }
 
 func (p *Plot) Set(ps []rl.Vector2) {
-	p.prevLimits = p.getLimits()
-	p.curLimits = minmax(ps)
 	p.prev = p.getPs()
 	p.cur = ps
-	p.updated = rl.GetTime()
+	p.psUpdated = rl.GetTime()
+	p.SetLimits(minmax(ps).Zoomed(.01))
+}
+
+func (p *Plot) SetLimits(ls limits) {
+	p.prevLimits = p.getLimits()
+	p.curLimits = ls
+	p.limitsUpdated = rl.GetTime()
 }
 
 func (p Plot) getLimits() limits {
 	var ls limits
 	now := rl.GetTime()
-	animTime := now - p.updated
+	animTime := now - p.limitsUpdated
 	if animTime < p.animDuration {
 		f := float32(animTime / p.animDuration)
 		ls = limits{
@@ -185,14 +216,15 @@ func findClosest(ps []rl.Vector2, mp rl.Vector2) (int, float32) {
 }
 
 func NewPlot(ps []rl.Vector2) *Plot {
-	ls := minmax(ps)
+	ls := minmax(ps).Zoomed(.01)
 	return &Plot{
-		cur:          ps,
-		prev:         ps,
-		updated:      rl.GetTime(),
-		curLimits:    ls,
-		prevLimits:   ls,
-		animDuration: .2,
+		cur:           ps,
+		prev:          ps,
+		psUpdated:     rl.GetTime(),
+		limitsUpdated: rl.GetTime(),
+		curLimits:     ls,
+		prevLimits:    ls,
+		animDuration:  .2,
 	}
 }
 

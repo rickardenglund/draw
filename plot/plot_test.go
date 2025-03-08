@@ -104,3 +104,29 @@ func Test_extend(t *testing.T) {
 	require.Equal(t, []int{1, 2, 3, 3, 3, 3}, got)
 
 }
+
+func Test_clamp(t *testing.T) {
+	tt := []struct {
+		p     rl.Vector2
+		rec   rl.Rectangle
+		wantP rl.Vector2
+	}{
+		{
+			p:     rl.NewVector2(10, 10),
+			rec:   rl.NewRectangle(5, 0, 100, 100),
+			wantP: rl.NewVector2(10, 10),
+		},
+		{
+			p:     rl.NewVector2(10, 10),
+			rec:   rl.NewRectangle(20, 20, 100, 100),
+			wantP: rl.NewVector2(20, 20),
+		},
+	}
+	for _, tt := range tt {
+		t.Run("", func(t *testing.T) {
+			p := clamp(tt.p, tt.rec)
+			require.Equal(t, tt.wantP, p)
+		})
+	}
+
+}

@@ -23,6 +23,40 @@ type limits struct {
 	minY, maxY float32
 }
 
+func (l limits) ZoomedX() limits {
+	return limits{
+		minX: l.minX * 1.1,
+		maxX: l.maxX * .9,
+		minY: l.minY * 1.1,
+		maxY: l.maxY * .9,
+	}
+}
+
+func (l limits) ZoomedXOut() limits {
+	return limits{
+		minX: l.minX * .9,
+		maxX: l.maxX * 1.1,
+		minY: l.minY * .9,
+		maxY: l.maxY * 1.1,
+	}
+}
+
+func (l limits) Zoomed(f float32) limits {
+	dx := l.maxX - l.minX
+	newDx := dx * (1 + f)
+	extraX := newDx - dx
+
+	dy := l.maxY - l.minY
+	newDy := dy * (1 + f)
+	extraY := newDy - dy
+	return limits{
+		minX: l.minX - extraX/2,
+		maxX: l.maxX + extraX/2,
+		minY: l.minY - extraY/2,
+		maxY: l.maxY + extraY/2,
+	}
+}
+
 func minmax(ps []rl.Vector2) limits {
 	minX, maxX := math.MaxFloat32, -math.MaxFloat32
 	minY, maxY := math.MaxFloat32, -math.MaxFloat32
@@ -51,4 +85,13 @@ func (s scale) transform(pos rl.Vector2) rl.Vector2 {
 	sp.Y += s.target.Height / 2
 
 	return sp
+}
+
+func (s scale) transformR(sp rl.Vector2) rl.Vector2 {
+	pos := rl.Vector2Subtract(sp, rl.NewVector2(s.target.X, s.target.Y))
+
+	pos.X = inter(pos.X, 0, s.target.Width, s.l.minX, s.l.maxX)
+	pos.Y = inter(pos.Y, 0, s.target.Height, s.l.maxY, s.l.minY)
+
+	return pos
 }
