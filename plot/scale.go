@@ -41,7 +41,7 @@ func (l limits) ZoomedXOut() limits {
 	}
 }
 
-func (l limits) Zoomed(f float32) limits {
+func (l limits) CenterZoomed(f float32) limits {
 	dx := l.maxX - l.minX
 	newDx := dx * (1 + f)
 	extraX := newDx - dx
@@ -49,11 +49,33 @@ func (l limits) Zoomed(f float32) limits {
 	dy := l.maxY - l.minY
 	newDy := dy * (1 + f)
 	extraY := newDy - dy
+
 	return limits{
 		minX: l.minX - extraX/2,
 		maxX: l.maxX + extraX/2,
 		minY: l.minY - extraY/2,
 		maxY: l.maxY + extraY/2,
+	}
+}
+func (l limits) Zoomed(f float32, s scale) limits {
+	mp := rl.GetMousePosition()
+	v := s.transformR(mp)
+
+	dx := l.maxX - l.minX
+	newDx := dx * (1 + f)
+	extraX := newDx - dx
+	fx := (v.X - l.minX) / (l.maxX - l.minX)
+
+	dy := l.maxY - l.minY
+	newDy := dy * (1 + f)
+	extraY := newDy - dy
+	fy := (v.Y - l.minY) / (l.maxY - l.minY)
+
+	return limits{
+		minX: l.minX - extraX*fx,
+		maxX: l.maxX + extraX*(1-fx),
+		minY: l.minY - extraY*fy,
+		maxY: l.maxY + extraY*(1-fy),
 	}
 }
 

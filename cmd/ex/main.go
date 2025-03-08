@@ -59,6 +59,10 @@ func main() {
 			{30, 10},
 			{30, 5},
 		},
+		{
+			{5, 15},
+			{10, 15},
+		},
 	}
 	plt := plot.NewPlot(myShapes[0])
 	nextShapeF := func() {
@@ -72,17 +76,22 @@ func main() {
 		text.NewBlinkablef("hejsan: %d", 3),
 		text.NewBlinkablef("hejsan: %d", 4),
 	}
+
+	updateLabel := widget.NewClickable(
+		text.NewTextf("updated"), updatePlotsF,
+	)
+
 	v := views.NewColumnView(
 		views.NewRowView(
 			views.NewMultiRowView(
-				views.MultiItem{text.NewTextf("Plt"), plt},
-				views.MultiItem{text.NewTextf("Muave"), shapes.NewSquare(rl.NewVector2(50, 30), theme.Muave)},
-				views.MultiItem{text.NewTextf("Salmon"), shapes.NewSquare(rl.NewVector2(20, 50), theme.Salmon)},
-				views.MultiItem{text.NewTextf("Green"), shapes.NewSquare(rl.NewVector2(20, 50), rl.Green)},
+				views.MultiItem{Label: text.NewTextf("Plt"), Full: plt},
+				views.MultiItem{Label: text.NewTextf("Muave"), Full: shapes.NewSquare(rl.NewVector2(50, 30), theme.Muave)},
+				views.MultiItem{Label: text.NewTextf("Salmon"), Full: shapes.NewSquare(rl.NewVector2(20, 50), theme.Salmon)},
+				views.MultiItem{Label: text.NewTextf("Green"), Full: shapes.NewSquare(rl.NewVector2(20, 50), rl.Green)},
 			),
 			sp,
 			views.NewMultiColumnView(
-				views.MultiItem{Label: text.NewTextf("update"), Full: views.NewColumnView(
+				views.MultiItem{Label: updateLabel, Full: views.NewColumnView(
 					widget.NewButton("Update Plot", updatePlotsF),
 					widget.NewButton("Next Shape", nextShapeF),
 					widget.NewButton("blink", blink(blinkables)),
@@ -116,5 +125,4 @@ func blink(bs []draw.Drawable) func() {
 		}()
 
 	}
-
 }

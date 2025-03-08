@@ -70,9 +70,8 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 		screenPs[i] = sp
 	}
 
-	origo := s.transform(rl.Vector2{})
-	o1 := rl.NewVector2(screenPs[0].X, origo.Y)
-	o2 := rl.NewVector2(o1.X+targetData.Width, o1.Y)
+	o1 := s.transform(rl.NewVector2(ls.minX, 0))
+	o2 := s.transform(rl.NewVector2(ls.maxX, 0))
 	if rl.CheckCollisionPointRec(o1, targetData) {
 		rl.DrawLineEx(o1, o2, 2, theme.Salmon)
 	}
@@ -101,7 +100,10 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 
 	mp := rl.GetMousePosition()
 	ci, d := findClosest(screenPs, mp)
-	if !p.selection.IsActive() && d < 30 && rl.CheckCollisionPointRec(mp, targetWidget) {
+	if !p.selection.IsActive() &&
+		d < 30 &&
+		rl.CheckCollisionPointRec(mp, targetWidget) &&
+		rl.IsKeyDown(rl.KeySpace) {
 		p := ps[ci]
 		fmtString := fmt.Sprintf("Y: %s\nX: %s", getFmt(0, p.Y), getFmt(0, p.X))
 		msg := fmt.Sprintf(fmtString, p.Y, p.X)
@@ -173,11 +175,20 @@ func (p *Plot) Set(ps []rl.Vector2) {
 	p.prev = p.getPs()
 	p.cur = ps
 	p.psUpdated = rl.GetTime()
-	p.SetLimits(minmax(ps).Zoomed(.01))
+	p.SetLimits(minmax(ps).CenterZoomed(.01))
 }
 
 func (p *Plot) SetLimits(ls limits) {
 	p.prevLimits = p.getLimits()
+
+	if ls.minY == ls.maxY {
+		ls.minY -= 1
+		ls.maxY += 10
+	}
+	if ls.minX == ls.maxX {
+		ls.minX -= 1
+		ls.maxX += 10
+	}
 	p.curLimits = ls
 	p.limitsUpdated = rl.GetTime()
 }
@@ -216,7 +227,7 @@ func findClosest(ps []rl.Vector2, mp rl.Vector2) (int, float32) {
 }
 
 func NewPlot(ps []rl.Vector2) *Plot {
-	ls := minmax(ps).Zoomed(.01)
+	ls := minmax(ps).CenterZoomed(.01)
 	return &Plot{
 		cur:           ps,
 		prev:          ps,
