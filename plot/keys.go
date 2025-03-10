@@ -33,6 +33,15 @@ func (p *Plot) handleKeys(target rl.Rectangle, s scale) {
 		if rl.IsKeyPressed(rl.KeyF) {
 			p.SetLimits(minmax(p.cur).Zoomed(.01, s))
 		}
+
+		if rl.IsKeyPressed(rl.KeyM) {
+			mpv := s.transformR(mp)
+			p.markers.addMarker(marker{v: mpv.X, harmonics: 3})
+		}
+
+		if rl.IsKeyPressed(rl.KeyR) {
+			p.markers = newMarkers()
+		}
 	} else {
 		if p.selection.IsActive() {
 			p.SetLimits(p.selection.GetLimits(s))

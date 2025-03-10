@@ -18,6 +18,7 @@ type Plot struct {
 	prevLimits    limits
 	animDuration  float64
 	selection     selection
+	markers       *markers
 }
 
 func (p Plot) GetSize(target rl.Rectangle) rl.Vector2 {
@@ -112,6 +113,8 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 		rl.DrawCircleV(mp, 3, theme.Charcoal)
 		rl.DrawCircleV(screenPs[ci], 3, theme.Charcoal)
 	}
+
+	p.markers.Draw(s)
 }
 
 func clamp(p rl.Vector2, target rl.Rectangle) rl.Vector2 {
@@ -236,6 +239,7 @@ func NewPlot(ps []rl.Vector2) *Plot {
 		curLimits:     ls,
 		prevLimits:    ls,
 		animDuration:  .2,
+		markers:       newMarkers(),
 	}
 }
 
