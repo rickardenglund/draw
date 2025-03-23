@@ -49,4 +49,5 @@ func (p *Plot) handleKeys(target rl.Rectangle, s scale) {
 		}
 	}
 
+	p.mover.handleKeys(active, s)
 }

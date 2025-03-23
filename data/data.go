@@ -29,7 +29,6 @@ func (d *Data) Update() {
 func (d *Data) Set(wave []rl.Vector2, sampleRate float32) {
 	ps := make([]float64, len(wave))
 
-	spectra := make([]rl.Vector2, len(wave)/2)
 	for i := range ps {
 		ps[i] = float64(wave[i].Y)
 	}
@@ -37,11 +36,15 @@ func (d *Data) Set(wave []rl.Vector2, sampleRate float32) {
 	binSize := sampleRate / float32(len(ps))
 
 	polars := fft.FFTReal(ps)
+
+	spectra := make([]rl.Vector2, len(wave)/2)
 	for i := range spectra {
 		m, _ := cmplx.Polar(polars[i])
 		f := float32(i) * binSize
+		m /= float64(len(spectra))
 		spectra[i] = rl.NewVector2(f, float32(m))
 	}
+	spectra[0].Y *= .5
 
 	d.tw = wave
 	d.sp = spectra

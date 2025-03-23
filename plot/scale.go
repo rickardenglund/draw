@@ -79,6 +79,16 @@ func (l limits) Zoomed(f float32, s scale) limits {
 	}
 }
 
+func (l limits) translated(move rl.Vector2) limits {
+
+	return limits{
+		minX: l.minX + move.X,
+		maxX: l.maxX + move.X,
+		minY: l.minY + move.Y,
+		maxY: l.maxY + move.Y,
+	}
+}
+
 func minmax(ps []rl.Vector2) limits {
 	minX, maxX := math.MaxFloat32, -math.MaxFloat32
 	minY, maxY := math.MaxFloat32, -math.MaxFloat32
