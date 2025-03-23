@@ -25,6 +25,8 @@ func main() {
 	pWf := plot.NewPlot(d.GetTWF())
 	pSp := plot.NewPlot(d.GetSP())
 
+	pSp.AddMarker(21)
+
 	c := views.NewColumnView(
 		pWf, pSp,
 	)

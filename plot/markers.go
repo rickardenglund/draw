@@ -20,6 +20,10 @@ func newMarkers() *markers {
 	}
 }
 
+func (p *Plot) AddMarker(v float32) {
+	p.markers.addMarker(marker{v: v, harmonics: 1})
+}
+
 func (m *markers) addMarker(x marker) {
 	m.xs = append(m.xs, x)
 }
