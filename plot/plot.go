@@ -113,10 +113,10 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 		p := ps[ci]
 		fmtString := fmt.Sprintf("Y: %s\nX: %s", getFmt(0, p.Y), getFmt(0, p.X))
 		msg := fmt.Sprintf(fmtString, p.Y, p.X)
-		floating.TextArea(mp, msg)
 		rl.DrawLineEx(mp, screenPs[ci], 1, theme.Charcoal)
 		rl.DrawCircleV(mp, 3, theme.Charcoal)
 		rl.DrawCircleV(screenPs[ci], 3, theme.Charcoal)
+		floating.TextArea(targetWidget, mp, msg)
 	}
 
 	p.markers.Draw(s)
