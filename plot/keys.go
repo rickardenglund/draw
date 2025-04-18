@@ -32,6 +32,7 @@ func (p *Plot) handleKeys(target rl.Rectangle, s scale) {
 
 		if rl.IsKeyPressed(rl.KeyF) {
 			p.SetLimits(minmax(p.cur).Zoomed(.01, s))
+			p.mover.Reset()
 		}
 
 		if rl.IsKeyPressed(rl.KeyM) {

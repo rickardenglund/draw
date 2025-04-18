@@ -10,7 +10,9 @@ import (
 
 type mover struct {
 	start *rl.Vector2
-	moved rl.Vector2
+
+	offset    rl.Vector2
+	tmpOffset rl.Vector2
 }
 
 func (m *mover) Draw(target rl.Rectangle) {
@@ -33,23 +35,30 @@ func (m *mover) handleKeys(active bool, s scale) {
 		if rl.IsKeyDown(rl.KeyD) {
 			if m.start == nil {
 				m.start = &mp
-				m.moved = rl.NewVector2(0, 0)
+				//m.offset = rl.NewVector2(0, 0)
+				m.tmpOffset = rl.Vector2Zero()
 			} else {
 				delta := rl.Vector2Subtract(s.transformR(*m.start), s.transformR(mp))
 
-				m.moved = delta
+				m.tmpOffset = delta
 			}
 		}
 		if rl.IsKeyReleased(rl.KeyD) {
 			m.start = nil
+			m.offset = rl.Vector2Add(m.tmpOffset, m.offset)
+			m.tmpOffset = rl.Vector2Zero()
 		}
 	} else {
 		m.start = nil
-		m.moved = rl.NewVector2(0, 0)
+		m.tmpOffset = rl.Vector2Zero()
 	}
 
 }
 
 func (m *mover) GetOffset() rl.Vector2 {
-	return m.moved
+	return rl.Vector2Add(m.offset, m.tmpOffset)
+}
+
+func (m *mover) Reset() {
+	m.offset = rl.NewVector2(0, 0)
 }

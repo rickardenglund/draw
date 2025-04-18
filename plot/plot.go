@@ -10,16 +10,20 @@ import (
 )
 
 type Plot struct {
-	cur           []rl.Vector2
-	prev          []rl.Vector2
-	psUpdated     float64
+	cur       []rl.Vector2
+	prev      []rl.Vector2
+	psUpdated float64
+
 	limitsUpdated float64
 	curLimits     limits
 	prevLimits    limits
-	animDuration  float64
-	selection     selection
-	mover         mover
-	markers       *markers
+
+	selection    selection
+	animDuration float64
+
+	mover mover
+
+	markers *markers
 }
 
 func (p Plot) GetSize(target rl.Rectangle) rl.Vector2 {
@@ -33,11 +37,9 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 
 	ps := p.getPs()
 
-	//p.SetLimits(p.getLimits().translated(p.mover.GetOffset()))
 	ls := p.getLimits()
 	offset := p.mover.GetOffset()
 	ls = ls.translated(offset)
-	//p.SetLimits(offset)
 
 	YTickSize := theme.MeaureTextPad(fmt.Sprintf(getFmt(ls.minY, ls.maxY), ls.maxY))
 	XTickSize := theme.MeaureTextPad(fmt.Sprintf(getFmt(ls.minX, ls.maxX), ls.maxX))
