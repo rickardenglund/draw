@@ -1,11 +1,7 @@
 package plot
 
 import (
-	"fmt"
-
 	rl "github.com/gen2brain/raylib-go/raylib"
-
-	"github.com/rickardenglund/draw/theme"
 )
 
 type mover struct {
@@ -18,13 +14,7 @@ type mover struct {
 func (m *mover) Draw(target rl.Rectangle) {
 	mp := rl.GetMousePosition()
 	if m.start != nil {
-		rl.DrawLineV(*m.start, mp, rl.White)
-	}
-
-	if m.start != nil {
-		s := fmt.Sprintf("%v", *m.start)
-		p := rl.NewVector2(target.X, target.Y)
-		theme.DrawTextPad(s, p, theme.Charcoal)
+		rl.DrawLineV(*m.start, mp, rl.ColorAlpha(rl.White, .5))
 	}
 }
 

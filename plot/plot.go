@@ -41,8 +41,8 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 	offset := p.mover.GetOffset()
 	ls = ls.translated(offset)
 
-	YTickSize := theme.MeaureTextPad(fmt.Sprintf(getFmt(ls.minY, ls.maxY), ls.maxY))
-	XTickSize := theme.MeaureTextPad(fmt.Sprintf(getFmt(ls.minX, ls.maxX), ls.maxX))
+	YTickSize := getWidest(ls.minY, ls.maxY) //theme.MeaureTextPad(fmt.Sprintf(getFmt(ls.maxY), ls.maxY))
+	XTickSize := theme.MeaureTextPad(fmt.Sprintf(getFmt(ls.maxX), ls.maxX))
 	targetPlot := theme.Pad(targetWidget)
 
 	yAxisWidth := YTickSize.X
@@ -113,7 +113,7 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 		rl.CheckCollisionPointRec(mp, targetWidget) &&
 		rl.IsKeyDown(rl.KeySpace) {
 		p := ps[ci]
-		fmtString := fmt.Sprintf("Y: %s\nX: %s", getFmt(0, p.Y), getFmt(0, p.X))
+		fmtString := fmt.Sprintf("Y: %s\nX: %s", getFmt(p.Y), getFmt(p.X))
 		msg := fmt.Sprintf(fmtString, p.Y, p.X)
 		rl.DrawLineEx(mp, screenPs[ci], 1, theme.Charcoal)
 		rl.DrawCircleV(mp, 3, theme.Charcoal)
