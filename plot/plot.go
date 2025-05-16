@@ -190,6 +190,19 @@ func (p *Plot) Set(ps []rl.Vector2) {
 	p.SetLimits(minmax(ps).CenterZoomed(.01))
 }
 
+func (p *Plot) ShiftIn(in rl.Vector2, maxSize int) {
+	newPrev := p.cur
+	if len(newPrev) >= maxSize {
+		newPrev = newPrev[1:]
+	}
+
+	p.prev = newPrev
+	p.cur = append(p.prev, in)
+
+	p.psUpdated = rl.GetTime()
+	p.SetLimits(minmax(p.cur).CenterZoomed(.01))
+}
+
 func (p *Plot) SetLimits(ls limits) {
 	p.prevLimits = p.getLimits()
 
