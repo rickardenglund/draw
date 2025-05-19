@@ -94,13 +94,20 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 		th := thickness / 2
 		if !rl.CheckCollisionPointRec(sp, targetData) {
 			sp = clamp(sp, targetData)
-			screenPs[i] = sp
+			//screenPs[i] = sp
 			clr = rl.Red
 			th *= 4
 		}
 		rl.DrawCircleV(sp, th, clr)
 	}
-	rl.DrawLineStrip(screenPs, theme.Charcoal)
+
+	//rl.DrawLineStrip(screenPs, theme.Charcoal)
+	for i := 1; i < len(screenPs); i++ {
+		if rl.CheckCollisionPointRec(screenPs[i], targetData) &&
+			rl.CheckCollisionPointRec(screenPs[i-1], targetData) {
+			rl.DrawLineV(screenPs[i-1], screenPs[i], theme.Charcoal)
+		}
+	}
 
 	if p.selection.IsActive() {
 		rl.DrawRectangleLinesEx(p.selection.GetRect(), 2, rl.ColorAlpha(rl.White, .5))
