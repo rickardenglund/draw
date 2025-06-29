@@ -10,7 +10,7 @@ import (
 )
 
 func drawAxisX(target rl.Rectangle, s scale) {
-	w := theme.MeaureTextPad(fmt.Sprintf(getFmt(s.l.maxX), s.l.maxX))
+	w := theme.MeaureTextPad(fmt.Sprintf(getFmt(s.l.DeltaX()), s.l.maxX))
 	n := int(math.Floor(float64(target.Width / w.X)))
 	dx := (s.l.maxX - s.l.minX) / float32(n)
 	for i := range n {
@@ -60,19 +60,8 @@ func drawAxisY(target rl.Rectangle, s scale) {
 	dy := (s.l.maxY - s.l.minY) / float32(n)
 	for i := range n {
 		v := s.l.minY + float32(i)*dy
-		tickY(target, s, v, getFmt(v))
+		tickY(target, s, v, getFmt(s.l.maxY-s.l.minY))
 	}
-}
-
-func getWidest(a, b float32) rl.Vector2 {
-	aw := theme.MeaureTextPad(fmt.Sprintf(getFmt(a), a))
-	bw := theme.MeaureTextPad(fmt.Sprintf(getFmt(b), b))
-
-	if aw.X > bw.X {
-		return aw
-	}
-
-	return bw
 }
 
 func tickY(target rl.Rectangle, s scale, y float32, format string) {

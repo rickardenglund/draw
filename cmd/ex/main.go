@@ -95,7 +95,6 @@ func main() {
 					widget.NewButton("Update Plot", updatePlotsF),
 					widget.NewButton("Next Shape", nextShapeF),
 					widget.NewButton("blink", blink(blinkables)),
-
 				)},
 				views.MultiItem{Label: text.NewTextf("size"), Full: widget.NewButton("New Size", f)},
 				views.MultiItem{Label: text.NewTextf("myC"), Full: myC},

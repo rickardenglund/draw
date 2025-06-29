@@ -31,7 +31,6 @@ func main() {
 	v := views.NewColumnView(
 		btn,
 		p,
-
 	)
 
 	draw.NewWindow(rl.NewVector2(900, 550), func() {}, v)

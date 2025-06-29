@@ -41,7 +41,7 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 	offset := p.mover.GetOffset()
 	ls = ls.translated(offset)
 
-	YTickSize := getWidest(ls.minY, ls.maxY) //theme.MeaureTextPad(fmt.Sprintf(getFmt(ls.maxY), ls.maxY))
+	YTickSize := theme.MeaureTextPad(fmt.Sprintf(getFmt(ls.maxY-ls.minY), ls.maxY))
 	XTickSize := theme.MeaureTextPad(fmt.Sprintf(getFmt(ls.maxX), ls.maxX))
 	targetPlot := theme.Pad(targetWidget)
 
@@ -102,11 +102,14 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 	}
 
 	//rl.DrawLineStrip(screenPs, theme.Charcoal)
+	//for i := 1; i < len(screenPs); i++ {
+	//	if rl.CheckCollisionPointRec(screenPs[i], targetData) &&
+	//		rl.CheckCollisionPointRec(screenPs[i-1], targetData) {
+	//		rl.DrawLineV(screenPs[i-1], screenPs[i], theme.Charcoal)
+	//	}
+	//}
 	for i := 1; i < len(screenPs); i++ {
-		if rl.CheckCollisionPointRec(screenPs[i], targetData) &&
-			rl.CheckCollisionPointRec(screenPs[i-1], targetData) {
-			rl.DrawLineV(screenPs[i-1], screenPs[i], theme.Charcoal)
-		}
+		lineInSquare(screenPs[i-1], screenPs[i], targetData)
 	}
 
 	if p.selection.IsActive() {
@@ -120,7 +123,7 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 		rl.CheckCollisionPointRec(mp, targetWidget) &&
 		rl.IsKeyDown(rl.KeySpace) {
 		p := ps[ci]
-		fmtString := fmt.Sprintf("Y: %s\nX: %s", getFmt(p.Y), getFmt(p.X))
+		fmtString := fmt.Sprintf("Y: %s\nX: %s", getFmt(ls.DeltaY()), getFmt(ls.DeltaX()))
 		msg := fmt.Sprintf(fmtString, p.Y, p.X)
 		rl.DrawLineEx(mp, screenPs[ci], 1, theme.Charcoal)
 		rl.DrawCircleV(mp, 3, theme.Charcoal)
@@ -131,6 +134,74 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 	p.markers.Draw(s)
 
 	p.mover.Draw(targetPlot)
+}
+
+func lineInSquare(a, b rl.Vector2, target rl.Rectangle) {
+	aIn := rl.CheckCollisionPointRec(a, target)
+	bIn := rl.CheckCollisionPointRec(b, target)
+	if aIn && bIn {
+		rl.DrawLineV(a, b, theme.Charcoal)
+		return
+	}
+	if !aIn && !bIn {
+		//mid := rl.Vector2Add(a,
+		//	rl.Vector2Scale(rl.Vector2Subtract(b, a), 0.5),
+		//)
+
+		//rl.DrawCircleV(mid, 3, rl.Blue)
+		//lineInSquare(a, mid, target)
+		//lineInSquare(b, mid, target)
+		return
+		//b = mid
+	}
+
+	if !aIn && bIn {
+		a, b = b, a
+	}
+
+	col := rl.Vector2{}
+	if colLineRect(a, b, target, &col) {
+		rl.DrawLineV(a, col, theme.Charcoal)
+	}
+}
+
+func colLineRect(a rl.Vector2, b rl.Vector2, target rl.Rectangle, res *rl.Vector2) bool {
+	if rl.CheckCollisionLines( // top
+		a,
+		b,
+		rl.NewVector2(target.X, target.Y),
+		rl.NewVector2(target.X+target.Width, target.Y),
+		res) {
+		return true
+	}
+
+	if rl.CheckCollisionLines( // left
+		a,
+		b,
+		rl.NewVector2(target.X, target.Y),
+		rl.NewVector2(target.X, target.Y+target.Height),
+		res) {
+		return true
+	}
+
+	if rl.CheckCollisionLines( // right
+		a,
+		b,
+		rl.NewVector2(target.X+target.Width, target.Y),
+		rl.NewVector2(target.X+target.Width, target.Y+target.Height),
+		res) {
+		return true
+	}
+	if rl.CheckCollisionLines( // bottom
+		a,
+		b,
+		rl.NewVector2(target.X, target.Y+target.Height),
+		rl.NewVector2(target.X+target.Width, target.Y+target.Height),
+		res) {
+		return true
+	}
+
+	return false
 }
 
 func clamp(p rl.Vector2, target rl.Rectangle) rl.Vector2 {

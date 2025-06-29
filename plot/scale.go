@@ -23,6 +23,14 @@ type limits struct {
 	minY, maxY float32
 }
 
+func (l limits) DeltaX() float32 {
+	return l.maxX - l.minX
+}
+
+func (l limits) DeltaY() float32 {
+	return l.maxY - l.minY
+}
+
 func (l limits) ZoomedX() limits {
 	return limits{
 		minX: l.minX * 1.1,
