@@ -39,8 +39,12 @@ func (v LinearView) Draw(target rl.Rectangle) {
 	}
 }
 
-func NewRowView(objs ...draw.Drawable) draw.Drawable {
-	return LinearView{objs: objs, dir: rl.NewVector2(1, 0)}
+func (v *LinearView) Add(objs ...draw.Drawable) {
+	v.objs = append(v.objs, objs...)
+}
+
+func NewRowView(objs ...draw.Drawable) *LinearView {
+	return &LinearView{objs: objs, dir: rl.NewVector2(1, 0)}
 }
 
 func NewColumnView(objs ...draw.Drawable) *LinearView {

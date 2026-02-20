@@ -7,6 +7,7 @@ import (
 
 	"github.com/rickardenglund/draw/draw"
 	"github.com/rickardenglund/draw/plot"
+	"github.com/rickardenglund/draw/shapes"
 	"github.com/rickardenglund/draw/views"
 	"github.com/rickardenglund/draw/widget"
 )
@@ -29,6 +30,7 @@ func main() {
 	})
 
 	v := views.NewColumnView(
+		shapes.NewCool(20, rl.Red),
 		btn,
 		p,
 	)
