@@ -227,7 +227,7 @@ func (g *Group) Draw(t rl.Rectangle) {
 		c := pToPos(t, n.p)
 		toDraw := g.Nodes[n.id].Draw
 
-		s := toDraw.GetSize(rl.NewRectangle(c.X, c.Y, 100, 50))
+		s := toDraw.GetSize(rl.NewRectangle(c.X, c.Y, 100, 75))
 		r := rl.NewRectangle(c.X-s.X/2, c.Y-s.Y/2, s.X, s.Y)
 
 		rl.DrawRectangleRec(r, rl.ColorAlpha(theme.Charcoal, .2))
