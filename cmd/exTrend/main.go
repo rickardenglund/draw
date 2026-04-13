@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -12,8 +13,20 @@ import (
 	"github.com/rickardenglund/draw/widget"
 )
 
+type myp struct {
+	X float32
+	Y float32
+}
+
+func (p myp) GetXString() string {
+	return fmt.Sprintf("(%.2f)", p.X)
+}
+func (p myp) GetYString() string {
+	return fmt.Sprintf("%.2f", p.Y)
+}
+
 func main() {
-	ps := []rl.Vector2{
+	ps := []myp{
 		{X: -5, Y: 5},
 		{-3, 8},
 		{-1, 5},
@@ -25,7 +38,7 @@ func main() {
 	p := plot.NewPlot(ps)
 	btn := widget.NewButton("do", func() {
 		newV := float32(time.Now().Nanosecond() % 30)
-		p.ShiftIn(rl.Vector2{X: float32(n), Y: newV}, 10)
+		p.ShiftIn(myp{X: float32(n), Y: newV}, 10)
 		n++
 	})
 

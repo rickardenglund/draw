@@ -3,6 +3,7 @@ package plot
 import (
 	"testing"
 
+	rl "github.com/gen2brain/raylib-go/raylib"
 	"github.com/stretchr/testify/require"
 )
 
@@ -13,7 +14,10 @@ func Test_limits_Zoomed(t *testing.T) {
 		minY: 0,
 		maxY: 100,
 	}
-	z := l.Zoomed(.1)
+	z := l.Zoomed(.1, scale{
+		target: rl.Rectangle{},
+		l:      limits{},
+	})
 	require.Equal(t, float32(105), z.maxX)
 	require.Equal(t, float32(-5), z.minX)
 	require.Equal(t, float32(105), z.maxY)

@@ -9,9 +9,21 @@ import (
 	"github.com/rickardenglund/draw/theme"
 )
 
-type Plot struct {
-	cur       []rl.Vector2
-	prev      []rl.Vector2
+type point interface {
+	~struct {
+		X float32
+		Y float32
+	}
+}
+
+type Labeler interface {
+	GetXString() string
+	GetYString() string
+}
+
+type Plot[P point] struct {
+	cur       []P
+	prev      []P
 	psUpdated float64
 
 	limitsUpdated float64
@@ -26,11 +38,11 @@ type Plot struct {
 	markers *markers
 }
 
-func (p Plot) GetSize(target rl.Rectangle) rl.Vector2 {
+func (p Plot[point]) GetSize(target rl.Rectangle) rl.Vector2 {
 	return rl.NewVector2(target.Width, target.Height)
 }
 
-func (p *Plot) Draw(targetWidget rl.Rectangle) {
+func (p *Plot[point]) Draw(targetWidget rl.Rectangle) {
 	if len(p.cur) < 2 {
 		return
 	}
@@ -74,7 +86,7 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 
 	screenPs := make([]rl.Vector2, len(ps))
 	for i := range ps {
-		sp := s.transform(ps[i])
+		sp := s.transform(rl.Vector2(ps[i]))
 		screenPs[i] = sp
 	}
 
@@ -122,9 +134,24 @@ func (p *Plot) Draw(targetWidget rl.Rectangle) {
 		d < 30 &&
 		rl.CheckCollisionPointRec(mp, targetWidget) &&
 		rl.IsKeyDown(rl.KeySpace) {
-		p := ps[ci]
-		fmtString := fmt.Sprintf("Y: %s\nX: %s", getFmt(ls.DeltaY()), getFmt(ls.DeltaX()))
-		msg := fmt.Sprintf(fmtString, p.Y, p.X)
+		p2 := rl.Vector2(ps[ci])
+		lab, ok := any(ps[ci]).(Labeler)
+		msg := "msg"
+		if ok {
+			msg = fmt.Sprintf(
+				"Y: %s\nX: %s",
+				lab.GetYString(),
+				lab.GetXString(),
+			)
+		} else {
+			fmtString := fmt.Sprintf(
+				"Y: %s\nX: %s",
+				getFmt(ls.DeltaY()),
+				getFmt(ls.DeltaX()),
+			)
+			msg = fmt.Sprintf(fmtString, p2.Y, p2.X)
+		}
+
 		rl.DrawLineEx(mp, screenPs[ci], 1, theme.Charcoal)
 		rl.DrawCircleV(mp, 3, theme.Charcoal)
 		rl.DrawCircleV(screenPs[ci], 3, theme.Charcoal)
@@ -213,8 +240,8 @@ func clamp(p rl.Vector2, target rl.Rectangle) rl.Vector2 {
 	return rl.NewVector2(x, y)
 }
 
-func (p *Plot) getPs() []rl.Vector2 {
-	var ps []rl.Vector2
+func (p *Plot[point]) getPs() []point {
+	var ps []point
 	now := rl.GetTime()
 	animTime := now - p.psUpdated
 	if animTime > p.animDuration {
@@ -222,11 +249,11 @@ func (p *Plot) getPs() []rl.Vector2 {
 	}
 
 	n := max(len(p.cur), len(p.prev))
-	cur := make([]rl.Vector2, n)
+	cur := make([]point, n)
 	copy(cur, p.cur)
 	cur = cur[:len(p.cur)]
 
-	prev := make([]rl.Vector2, n)
+	prev := make([]point, n)
 	copy(prev, p.prev)
 	prev = prev[:len(p.prev)]
 
@@ -237,12 +264,12 @@ func (p *Plot) getPs() []rl.Vector2 {
 		cur = extend(cur, len(prev))
 	}
 
-	ps = make([]rl.Vector2, len(cur))
+	ps = make([]point, len(cur))
 	f := animTime / p.animDuration
 	for i := range cur {
-		diff := rl.Vector2Subtract(cur[i], prev[i])
+		diff := rl.Vector2Subtract(rl.Vector2(cur[i]), rl.Vector2(prev[i]))
 		scaled := rl.Vector2Scale(diff, float32(f))
-		ps[i] = rl.Vector2Add(prev[i], scaled)
+		ps[i] = point(rl.Vector2Add(rl.Vector2(prev[i]), scaled))
 	}
 	return ps
 }
@@ -261,14 +288,14 @@ func extend[T any](short []T, n int) []T {
 	return append(short, rest...)
 }
 
-func (p *Plot) Set(ps []rl.Vector2) {
+func (p *Plot[point]) Set(ps []point) {
 	p.prev = p.getPs()
 	p.cur = ps
 	p.psUpdated = rl.GetTime()
 	p.SetLimits(minmax(ps).CenterZoomed(.01))
 }
 
-func (p *Plot) ShiftIn(in rl.Vector2, maxSize int) {
+func (p *Plot[point]) ShiftIn(in point, maxSize int) {
 	newPrev := p.cur
 	if len(newPrev) >= maxSize {
 		newPrev = newPrev[1:]
@@ -281,7 +308,7 @@ func (p *Plot) ShiftIn(in rl.Vector2, maxSize int) {
 	p.SetLimits(minmax(p.cur).CenterZoomed(.01))
 }
 
-func (p *Plot) SetLimits(ls limits) {
+func (p *Plot[point]) SetLimits(ls limits) {
 	p.prevLimits = p.getLimits()
 
 	if ls.minY == ls.maxY {
@@ -296,7 +323,7 @@ func (p *Plot) SetLimits(ls limits) {
 	p.limitsUpdated = rl.GetTime()
 }
 
-func (p Plot) getLimits() limits {
+func (p Plot[point]) getLimits() limits {
 	var ls limits
 	now := rl.GetTime()
 	animTime := now - p.limitsUpdated
@@ -329,9 +356,9 @@ func findClosest(ps []rl.Vector2, mp rl.Vector2) (int, float32) {
 	return closest, minDist
 }
 
-func NewPlot(ps []rl.Vector2) *Plot {
+func NewPlot[P point](ps []P) *Plot[P] {
 	ls := minmax(ps).CenterZoomed(.01)
-	return &Plot{
+	return &Plot[P]{
 		cur:           ps,
 		prev:          ps,
 		psUpdated:     rl.GetTime(),

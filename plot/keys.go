@@ -4,7 +4,7 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
-func (p *Plot) handleKeys(target rl.Rectangle, s scale) {
+func (p *Plot[point]) handleKeys(target rl.Rectangle, s scale) {
 	mp := rl.GetMousePosition()
 	active := rl.CheckCollisionPointRec(mp, target)
 	if active {

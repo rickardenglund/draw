@@ -97,11 +97,13 @@ func (l limits) translated(move rl.Vector2) limits {
 	}
 }
 
-func minmax(ps []rl.Vector2) limits {
+func minmax[P point](ps []P) limits {
 	minX, maxX := math.MaxFloat32, -math.MaxFloat32
 	minY, maxY := math.MaxFloat32, -math.MaxFloat32
 
-	for _, p := range ps {
+	for _, pT := range ps {
+		p := rl.Vector2(pT)
+
 		minX = min(minX, float64(p.X))
 		maxX = max(maxX, float64(p.X))
 
