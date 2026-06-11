@@ -82,29 +82,22 @@ func main() {
 	)
 
 	v := views.NewColumnView(
-		views.NewMaxSizePercent(
-			views.NewRowView(
-				views.NewMaxSizePercent(
-					views.NewMultiRowView(
-						views.MultiItem{Label: text.NewTextf("Plt"), Full: plt},
-						views.MultiItem{Label: text.NewTextf("Muave"), Full: shapes.NewSquare(rl.NewVector2(50, 30), theme.Muave)},
-						views.MultiItem{Label: text.NewTextf("Salmon"), Full: shapes.NewSquare(rl.NewVector2(20, 50), theme.Salmon)},
-						views.MultiItem{Label: text.NewTextf("Green"), Full: shapes.NewSquare(rl.NewVector2(20, 50), rl.Green)},
-					),
-					rl.NewVector2(.5, 1)),
-				views.NewMaxSizePercent(sp, rl.NewVector2(.3, 1)),
-				views.NewMaxSizePercent(views.NewMultiColumnView(
-					views.MultiItem{Label: updateLabel, Full: views.NewColumnView(
-						widget.NewButton("Update Plot", updatePlotsF),
-						widget.NewButton("Next Shape", nextShapeF),
-						widget.NewButton("blink", blink(blinkables)),
-					)},
-					views.MultiItem{Label: text.NewTextf("size"), Full: widget.NewButton("New Size", f)},
-					views.MultiItem{Label: text.NewTextf("myC"), Full: myC},
-				), rl.NewVector2(.2, 1)),
-				views.NewColumnView(blinkables...),
+		views.NewRowView(
+			views.NewMultiRowView(
+				views.MultiItem{Label: text.NewTextf("Plt"), Full: plt},
+				views.MultiItem{Label: text.NewTextf("Muave"), Full: shapes.NewSquare(rl.NewVector2(50, 30), theme.Muave)},
+				views.MultiItem{Label: text.NewTextf("Salmon"), Full: shapes.NewSquare(rl.NewVector2(20, 50), theme.Salmon)},
+				views.MultiItem{Label: text.NewTextf("Green"), Full: shapes.NewSquare(rl.NewVector2(20, 50), rl.Green)},
+				views.MultiItem{Label: updateLabel, Full: views.NewColumnView(
+					widget.NewButton("Update Plot", updatePlotsF),
+					widget.NewButton("Next Shape", nextShapeF),
+					widget.NewButton("blink", blink(blinkables)),
+				)},
+				views.MultiItem{Label: text.NewTextf("size"), Full: widget.NewButton("New Size", f)},
+				views.MultiItem{Label: text.NewTextf("myC"), Full: myC},
 			),
-			rl.NewVector2(1, .5)),
+			views.NewColumnView(blinkables...),
+		),
 
 		views.NewRowView(
 			twf,
