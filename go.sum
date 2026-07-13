@@ -8,6 +8,8 @@ github.com/gen2brain/raylib-go/easings v0.0.0-20250215042252-db8e47f0e5c5 h1:G0p
 github.com/gen2brain/raylib-go/easings v0.0.0-20250215042252-db8e47f0e5c5/go.mod h1:tvwfxDWbHojl/iRFMuBVhydd1IaObUiHpYyG1XKG5Po=
 github.com/gen2brain/raylib-go/easings v0.0.0-20260601164102-8d36eb1fc4fb h1:U3J0hMww9uHc74L+b2fkvzc/4PpFlCIC/2QycotcDQ0=
 github.com/gen2brain/raylib-go/easings v0.0.0-20260601164102-8d36eb1fc4fb/go.mod h1:tvwfxDWbHojl/iRFMuBVhydd1IaObUiHpYyG1XKG5Po=
+github.com/gen2brain/raylib-go/easings v0.0.0-20260619180708-8f9e96aca992 h1:z46KWbeE3i/FY3wuNpXrycCDkkNksg3mV5TYa4mWMFI=
+github.com/gen2brain/raylib-go/easings v0.0.0-20260619180708-8f9e96aca992/go.mod h1:tvwfxDWbHojl/iRFMuBVhydd1IaObUiHpYyG1XKG5Po=
 github.com/gen2brain/raylib-go/raylib v0.0.0-20250215042252-db8e47f0e5c5 h1:k8ZAxLgb/p5TvCi5VHFHM8JdnjwShNK4A0bLIwbktAU=
 github.com/gen2brain/raylib-go/raylib v0.0.0-20250215042252-db8e47f0e5c5/go.mod h1:BaY76bZk7nw1/kVOSQObPY1v1iwVE1KHAGMfvI6oK1Q=
 github.com/gen2brain/raylib-go/raylib v0.60.0 h1:KsP7W3EMkmb9zztivdgbh1bXR78pEuqP6jeUR8GCbEA=
@@ -26,6 +28,8 @@ golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 h1:nDVHiLt8aIbd/VzvPWN6kSOPE
 golang.org/x/exp v0.0.0-20250305212735-054e65f0b394/go.mod h1:sIifuuw/Yco/y6yb6+bDNfyeQ/MdPUy/hKEMYQV17cM=
 golang.org/x/exp v0.0.0-20260603202125-055de637280b h1:v1uXiEBHo8QA0LiGCo7UgHMzHT4Kdfpl2zmtH5vaP1Q=
 golang.org/x/exp v0.0.0-20260603202125-055de637280b/go.mod h1:d2fgXJLVs4dYDHUk5lwMIfzRzSrWCfGZb0ZqeLa/Vcw=
+golang.org/x/exp v0.0.0-20260709172345-9ea1abe57597 h1:qLvzZeaANDgyVOA8pyHCOStGlXn0rseXma+GQjeuv2g=
+golang.org/x/exp v0.0.0-20260709172345-9ea1abe57597/go.mod h1:EdfpwwqSu+0Li0mzskwHU6FWDV3t9Q+RZDo3QMUtL3Q=
 golang.org/x/sys v0.31.0 h1:ioabZlmFYtWhL+TRYpcnNlLwhyxaM9kWTDEmfnprqik=
 golang.org/x/sys v0.31.0/go.mod h1:BJP2sWEmIv4KK5OTEluFJCKSidICx8ciO85XgH3Ak8k=
 golang.org/x/sys v0.46.0 h1:noSf2Fq6F8DBgS+LysIkx7rIExoNHJsxOAtPp4rthXw=
