@@ -3,6 +3,7 @@ package groups
 import (
 	"fmt"
 	"slices"
+	"sync/atomic"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 
@@ -34,7 +35,12 @@ type Group struct {
 
 func NewGroup(nodes map[ID]Node) *Group {
 	// add missing nodes
-	for _, v := range nodes {
+	for k, v := range nodes {
+		if k == "" {
+			delete(nodes, k)
+			newID := genID()
+			nodes[newID] = v
+		}
 		_, exist := nodes[v.Parent]
 		if !exist && v.Parent != "" {
 			nodes[v.Parent] = Node{
@@ -85,6 +91,12 @@ func NewGroup(nodes map[ID]Node) *Group {
 		nodes:     tree,
 		root:      rootID,
 	}
+}
+
+var nextID atomic.Int32
+
+func genID() ID {
+	return ID(fmt.Sprintf("gen-%d", nextID.Add(1)))
 }
 
 func calcXPos(tree map[ID]node) {

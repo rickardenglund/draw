@@ -10,7 +10,7 @@ import (
 )
 
 func Test_wrap(t *testing.T) {
-	theme.Font = rl.LoadFontEx("/Users/rickard/Library/Fonts/AurulentSansMNerdFontMono-Regular.otf", 24, nil)
+	theme.Font = rl.LoadFontEx("/Users/rickardenglund/Library/Fonts/AurulentSansMNerdFontMono-Regular.otf", 24, nil)
 	tt := []struct {
 		in, want string
 		size     rl.Vector2

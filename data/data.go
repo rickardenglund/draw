@@ -34,7 +34,6 @@ func (d *Data) Set(wave []rl.Vector2, sampleRate float32) {
 	}
 
 	binSize := sampleRate / float32(len(ps))
-
 	polars := fft.FFTReal(ps)
 
 	spectra := make([]rl.Vector2, len(wave)/2)

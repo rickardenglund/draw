@@ -13,6 +13,7 @@ import (
 
 func main() {
 	m := map[groups.ID]groups.Node{
+		"":        {Parent: "qul"},
 		"c5_Lile": {Parent: "qul"},
 
 		"r2": {Parent: ""},
