@@ -30,7 +30,7 @@ type Group struct {
 	nodes     map[ID]node
 	root      ID
 	drawOrder []ID
-	drawdebuc bool
+	drawDebug bool
 }
 
 func NewGroup(nodes map[ID]Node) *Group {
@@ -213,7 +213,7 @@ func getChildres(tree map[ID]node, id ID) []ID {
 }
 
 func (g *Group) WithDebug() *Group {
-	g.drawdebuc = true
+	g.drawDebug = true
 	return g
 }
 
@@ -246,12 +246,12 @@ func (g *Group) Draw(t rl.Rectangle) {
 		rl.DrawRectangleLinesEx(r, 2, theme.Charcoal)
 		g.Nodes[n.id].Draw.Draw(r)
 
-		if g.drawdebuc {
+		if g.drawDebug {
 			//rl.DrawCircleV(c, 20, theme.Salmon)
-			debugTextpos := rl.Vector2Add(c, rl.NewVector2(s.X/2, -s.Y/2))
+			debugTextPos := rl.Vector2Add(c, rl.NewVector2(s.X/2, -s.Y/2))
 			theme.DrawText(
 				fmt.Sprintf("%d: %s\n(%.2f, %.2f)\n%d", n.level, n.id, n.p.X, n.p.Y, n.xpos),
-				debugTextpos, theme.Charcoal)
+				debugTextPos, theme.Charcoal)
 		}
 	}
 
