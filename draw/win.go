@@ -8,6 +8,10 @@ import (
 
 func NewWindow(size rl.Vector2, init func(), objs ...Drawable) {
 	rl.SetTraceLogLevel(rl.LogWarning)
+
+	rl.SetConfigFlags(rl.FlagWindowHighdpi)
+	rl.SetConfigFlags(rl.FlagMsaa4xHint)
+
 	rl.InitWindow(int32(size.X), int32(size.Y), "Super Window")
 	theme.Font = rl.GetFontDefault()
 	theme.Font = rl.LoadFontEx("/Users/rickardenglund/Library/Fonts/AurulentSansMNerdFontMono-Regular.otf", 24, nil)
