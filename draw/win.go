@@ -14,8 +14,12 @@ func NewWindow(size rl.Vector2, init func(), objs ...Drawable) {
 
 	rl.InitWindow(int32(size.X), int32(size.Y), "Super Window")
 	theme.Font = rl.GetFontDefault()
-	theme.Font = rl.LoadFontEx("/Users/rickardenglund/Library/Fonts/AurulentSansMNerdFontMono-Regular.otf", 24, nil)
-	defer rl.UnloadFont(theme.Font)
+
+	mf := rl.LoadFontEx("/usr/local/share/fonts/AurulentSansMNerdFontMono-Regular.otf", 24, nil)
+	if rl.IsFontValid(mf) {
+		theme.Font = mf
+		defer rl.UnloadFont(mf)
+	}
 
 	defer rl.CloseWindow()
 

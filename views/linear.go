@@ -7,12 +7,26 @@ import (
 )
 
 type LinearView struct {
-	objs []draw.Drawable
-	dir  rl.Vector2
+	objs       []draw.Drawable
+	dir        rl.Vector2
+	background rl.Color
 }
 
 func (v LinearView) GetSize(target rl.Rectangle) rl.Vector2 {
-	return rl.NewVector2(target.Width, target.Height)
+	s := rl.NewVector2(target.Width, target.Height)
+
+	mainDir := v.dir.Multiply(s)
+	ortho := rl.NewVector2(v.dir.Y, v.dir.X)
+	offDir := rl.Vector2Zero()
+	for i := range v.objs {
+		os := v.objs[i].GetSize(target)
+		d := ortho.Multiply(os)
+		if d.Length() > offDir.Length() {
+			offDir = d
+		}
+	}
+
+	return mainDir.Add(offDir)
 }
 
 func (v LinearView) Draw(target rl.Rectangle) {
@@ -26,7 +40,6 @@ func (v LinearView) Draw(target rl.Rectangle) {
 	step := rl.Vector2Multiply(v.dir, childSizeUni)
 	p := rl.NewVector2(target.X, target.Y)
 	for i := range v.objs {
-		//childSize := r.objs[i].GetSize(target) // should not be not target
 		childSize := rl.NewVector2(
 			max(orhoSize.X, childSizeUni.X),
 			max(orhoSize.Y, childSizeUni.Y),
@@ -44,9 +57,17 @@ func (v *LinearView) Add(objs ...draw.Drawable) {
 }
 
 func NewRowView(objs ...draw.Drawable) *LinearView {
-	return &LinearView{objs: objs, dir: rl.NewVector2(1, 0)}
+	return &LinearView{
+		objs:       objs,
+		dir:        rl.NewVector2(1, 0),
+		background: rl.NewColor(0, 0, 0, 0),
+	}
 }
 
 func NewColumnView(objs ...draw.Drawable) *LinearView {
-	return &LinearView{objs: objs, dir: rl.NewVector2(0, 1)}
+	return &LinearView{
+		objs:       objs,
+		dir:        rl.NewVector2(0, 1),
+		background: rl.NewColor(0, 0, 0, 0),
+	}
 }
