@@ -20,6 +20,16 @@ func newMarkers() *markers {
 	}
 }
 
+func (p *Plot[point]) SetMarkers(vs []float32) {
+	xs := make([]marker, len(vs))
+	for i := range vs {
+		xs[i] = marker{v: vs[i], harmonics: 1}
+	}
+	p.markers = &markers{
+		xs: xs,
+	}
+}
+
 func (p *Plot[point]) AddMarker(v float32) {
 	p.markers.addMarker(marker{v: v, harmonics: 1})
 }

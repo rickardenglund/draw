@@ -7,26 +7,26 @@ import (
 	"github.com/rickardenglund/draw/theme"
 )
 
-var _ draw.Drawable = &Title{}
+var _ draw.Drawable = &TopBar{}
 
-type Title struct {
-	title draw.Drawable
-	child draw.Drawable
+type TopBar struct {
+	topbar draw.Drawable
+	main   draw.Drawable
 }
 
-func (t Title) GetSize(target rl.Rectangle) rl.Vector2 {
+func (t TopBar) GetSize(target rl.Rectangle) rl.Vector2 {
 	return rl.NewVector2(target.X, target.Y)
 }
 
-func (t Title) Draw(target rl.Rectangle) {
-	s := t.title.GetSize(target)
-	t.title.Draw(rl.NewRectangle(target.X, target.Y, s.X, s.Y))
+func (t TopBar) Draw(target rl.Rectangle) {
+	s := t.topbar.GetSize(target)
+	t.topbar.Draw(rl.NewRectangle(target.X, target.Y, s.X, s.Y))
 	childTarget := rl.NewRectangle(target.X, target.Y+s.Y, target.Width, target.Height-s.Y)
-	t.child.Draw(childTarget)
+	t.main.Draw(childTarget)
 
 	rl.DrawLine(int32(childTarget.X), int32(childTarget.Y), int32(childTarget.X+childTarget.Width), int32(childTarget.Y), theme.Charcoal)
 }
 
-func NewTitle(s draw.Drawable, c draw.Drawable) *Title {
-	return &Title{title: s, child: c}
+func NewTopBar(s draw.Drawable, c draw.Drawable) *TopBar {
+	return &TopBar{topbar: s, main: c}
 }
