@@ -15,7 +15,8 @@ type Border struct {
 var _ draw.Drawable = &Border{}
 
 func (b Border) GetSize(target rl.Rectangle) rl.Vector2 {
-	return rl.NewVector2(target.Width, target.Height)
+	cs := b.child.GetSize(target)
+	return rl.NewVector2(cs.X, cs.Y)
 }
 
 func (b Border) Draw(target rl.Rectangle) {
