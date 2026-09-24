@@ -46,13 +46,12 @@ type Wrapped struct {
 
 func (w Wrapped) Draw(target rl.Rectangle) {
 	s := wrap(w.s, rl.NewVector2(target.Width, target.Height))
-	theme.DrawTextPad(s, rl.NewVector2(target.X, target.Y), theme.Charcoal)
+	NewTextf(s).Draw(target)
 }
 
 func (w Wrapped) GetSize(target rl.Rectangle) rl.Vector2 {
-	ms := theme.MeaureTextPad(w.s)
-	return rl.NewVector2(min(target.Width, ms.X), min(target.Height, ms.Y))
-	//return rl.NewVector2(target.Width, target.Height)
+	s := wrap(w.s, rl.NewVector2(target.Width, target.Height))
+	return NewTextf(s).GetSize(target)
 }
 
 func NewWrap(s string) *Wrapped {
