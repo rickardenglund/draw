@@ -50,7 +50,9 @@ func (w Wrapped) Draw(target rl.Rectangle) {
 }
 
 func (w Wrapped) GetSize(target rl.Rectangle) rl.Vector2 {
-	return rl.NewVector2(target.Width, target.Height)
+	ms := theme.MeaureTextPad(w.s)
+	return rl.NewVector2(min(target.Width, ms.X), min(target.Height, ms.Y))
+	//return rl.NewVector2(target.Width, target.Height)
 }
 
 func NewWrap(s string) *Wrapped {

@@ -16,7 +16,8 @@ type Text struct {
 }
 
 func (t Text) GetSize(target rl.Rectangle) rl.Vector2 {
-	return theme.MeaureTextPad(t.s)
+	ms := theme.MeaureTextPad(t.s)
+	return rl.NewVector2(min(target.Width, ms.X), min(target.Height, ms.Y))
 }
 
 func (t Text) Draw(target rl.Rectangle) {
