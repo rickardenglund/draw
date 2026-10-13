@@ -8,7 +8,7 @@ import (
 
 func TextArea(bounds rl.Rectangle, mp rl.Vector2, msg string) {
 	fontSize := float32(20)
-	spacing := float32(0)
+	spacing := theme.Spacing
 	ms := rl.MeasureTextEx(theme.Font, msg, fontSize, spacing)
 
 	padding := float32(10)

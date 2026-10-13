@@ -18,7 +18,7 @@ func (b Button) GetSize(target rl.Rectangle) rl.Vector2 {
 
 func (b *Button) Draw(target rl.Rectangle) {
 	fontSize := float32(14)
-	spacing := float32(.5)
+	spacing := theme.Spacing + .5
 	ms := rl.MeasureTextEx(theme.Font, b.title, fontSize, spacing)
 
 	mp := rl.GetMousePosition()
