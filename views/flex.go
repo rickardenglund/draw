@@ -40,22 +40,45 @@ const (
 type AlignItems int
 
 const (
-	AlignStretch AlignItems = iota
+	// AlignAuto is the zero value. As an item's align-self it inherits the
+	// view's AlignItems; as the view's AlignItems it behaves like AlignStretch.
+	AlignAuto AlignItems = iota
+	AlignStretch
 	AlignStart
 	AlignEnd
 	AlignCenter
-	// AlignAuto (only valid as an item's AlignSelf) means "inherit the view's AlignItems".
-	AlignAuto
 )
 
 // FlexItem wraps a Drawable with CSS flexbox-like sizing hints.
+// Create one with Item so that it starts from the CSS defaults.
 type FlexItem struct {
-	Drawable draw.Drawable
-	Grow     float32    // flex-grow
-	Shrink   float32    // flex-shrink
-	Basis    float32    // flex-basis on the main axis, -1 means "auto" (use GetSize)
-	AlignSelf AlignItems // align-self, defaults to AlignAuto (inherit view's AlignItems)
+	drawable  draw.Drawable
+	grow      float32
+	shrink    float32
+	basis     float32
+	autoBasis bool
+	alignSelf AlignItems
 }
+
+// Item returns a FlexItem with CSS defaults: grow 0, shrink 1, basis auto, align-self auto.
+func Item(d draw.Drawable) FlexItem {
+	return FlexItem{drawable: d, shrink: 1, autoBasis: true}
+}
+
+// Grow sets flex-grow.
+func (i FlexItem) Grow(g float32) FlexItem { i.grow = g; return i }
+
+// Shrink sets flex-shrink.
+func (i FlexItem) Shrink(s float32) FlexItem { i.shrink = s; return i }
+
+// Basis sets a fixed flex-basis on the main axis.
+func (i FlexItem) Basis(b float32) FlexItem { i.basis = b; i.autoBasis = false; return i }
+
+// BasisAuto makes the flex-basis come from the drawable's GetSize.
+func (i FlexItem) BasisAuto() FlexItem { i.autoBasis = true; return i }
+
+// AlignSelf sets align-self.
+func (i FlexItem) AlignSelf(a AlignItems) FlexItem { i.alignSelf = a; return i }
 
 // FlexView lays out its items similar to a CSS flexbox container.
 type FlexView struct {
@@ -81,17 +104,17 @@ func (f *FlexView) SetJustifyContent(j JustifyContent) *FlexView { f.justify = j
 func (f *FlexView) SetAlignItems(a AlignItems) *FlexView         { f.align = a; return f }
 func (f *FlexView) SetGap(gap float32) *FlexView                 { f.gap = gap; return f }
 
-// Add appends items with default grow/shrink/basis (0, 1, auto).
+// Add appends drawables with default item settings (see Item).
 func (f *FlexView) Add(objs ...draw.Drawable) *FlexView {
 	for _, o := range objs {
-		f.items = append(f.items, FlexItem{Drawable: o, Grow: 0, Shrink: 1, Basis: -1, AlignSelf: AlignAuto})
+		f.items = append(f.items, Item(o))
 	}
 	return f
 }
 
-// AddItem appends a fully configured FlexItem.
-func (f *FlexView) AddItem(item FlexItem) *FlexView {
-	f.items = append(f.items, item)
+// AddItem appends configured FlexItems.
+func (f *FlexView) AddItem(items ...FlexItem) *FlexView {
+	f.items = append(f.items, items...)
 	return f
 }
 
@@ -126,10 +149,10 @@ func (f FlexView) crossSize(target rl.Rectangle) float32 {
 }
 
 func (f FlexView) itemMain(item FlexItem, target rl.Rectangle) float32 {
-	if item.Basis >= 0 {
-		return item.Basis
+	if !item.autoBasis {
+		return item.basis
 	}
-	s := item.Drawable.GetSize(target)
+	s := item.drawable.GetSize(target)
 	if f.isRow() {
 		return s.X
 	}
@@ -137,7 +160,7 @@ func (f FlexView) itemMain(item FlexItem, target rl.Rectangle) float32 {
 }
 
 func (f FlexView) itemCross(item FlexItem, target rl.Rectangle) float32 {
-	s := item.Drawable.GetSize(target)
+	s := item.drawable.GetSize(target)
 	if f.isRow() {
 		return s.Y
 	}
@@ -157,21 +180,12 @@ func (f *FlexView) Draw(target rl.Rectangle) {
 	mainAvail := f.mainSize(target)
 	crossAvail := f.crossSize(target)
 
-	order := make([]int, len(f.items))
-	for i := range order {
-		order[i] = i
-	}
-	if f.isReverse() {
-		for l, r := 0, len(order)-1; l < r; l, r = l+1, r-1 {
-			order[l], order[r] = order[r], order[l]
-		}
-	}
-
-	// Split into lines according to wrap.
+	// Split into lines in source order; reverse directions are handled when
+	// positioning items, so the first line still holds the first items.
 	var lines []flexLine
 	cur := flexLine{}
 	curMain := float32(0)
-	for _, idx := range order {
+	for idx := range f.items {
 		basis := f.itemMain(f.items[idx], target)
 		add := basis
 		if len(cur.indexes) > 0 {
@@ -191,25 +205,34 @@ func (f *FlexView) Draw(target rl.Rectangle) {
 		lines = append(lines, cur)
 	}
 
-	crossStart := float32(0)
-	if f.isRow() {
-		crossStart = target.Y
+	// A nowrap container is single-line and its line fills the cross axis.
+	// With wrap, each line is as tall as its largest item and leftover cross
+	// space is shared equally between lines (align-content: stretch).
+	lineCross := make([]float32, len(lines))
+	if f.wrap == NoWrap {
+		lineCross[0] = crossAvail
 	} else {
-		crossStart = target.X
-	}
-
-	for _, line := range lines {
-		lineCross := crossAvail
-		if len(lines) > 1 {
-			lineCross = 0
+		total := float32(0)
+		for i, line := range lines {
 			for _, idx := range line.indexes {
-				lineCross = max(lineCross, f.itemCross(f.items[idx], target))
+				lineCross[i] = max(lineCross[i], f.itemCross(f.items[idx], target))
+			}
+			total += lineCross[i]
+		}
+		if extra := crossAvail - total; extra > 0 {
+			for i := range lineCross {
+				lineCross[i] += extra / float32(len(lines))
 			}
 		}
+	}
 
-		f.drawLine(target, line, mainAvail, crossStart, lineCross)
-
-		crossStart += lineCross
+	crossStart := target.X
+	if f.isRow() {
+		crossStart = target.Y
+	}
+	for i, line := range lines {
+		f.drawLine(target, line, mainAvail, crossStart, lineCross[i])
+		crossStart += lineCross[i]
 	}
 }
 
@@ -227,8 +250,8 @@ func (f *FlexView) drawLine(target rl.Rectangle, line flexLine, mainAvail float3
 	shrinkWeightSum := float32(0)
 	for i, idx := range line.indexes {
 		item := f.items[idx]
-		growSum += item.Grow
-		shrinkWeightSum += item.Shrink * line.basis[i]
+		growSum += item.grow
+		shrinkWeightSum += item.shrink * line.basis[i]
 	}
 
 	finalMain := make([]float32, n)
@@ -240,13 +263,13 @@ func (f *FlexView) drawLine(target rl.Rectangle, line flexLine, mainAvail float3
 	if freeSpace > 0 && growSum > 0 {
 		for i, idx := range line.indexes {
 			item := f.items[idx]
-			finalMain[i] += freeSpace * (item.Grow / growSum)
+			finalMain[i] += freeSpace * (item.grow / growSum)
 		}
 		remaining = 0
 	} else if freeSpace < 0 && shrinkWeightSum > 0 {
 		for i, idx := range line.indexes {
 			item := f.items[idx]
-			w := item.Shrink * line.basis[i]
+			w := item.shrink * line.basis[i]
 			finalMain[i] += freeSpace * (w / shrinkWeightSum)
 			if finalMain[i] < 0 {
 				finalMain[i] = 0
@@ -281,21 +304,23 @@ func (f *FlexView) drawLine(target rl.Rectangle, line flexLine, mainAvail float3
 		}
 	}
 
-	mainPos := startOffset
+	mainOrigin := target.Y
 	if f.isRow() {
-		mainPos += target.X
-	} else {
-		mainPos += target.Y
+		mainOrigin = target.X
 	}
+	mainPos := startOffset
 
 	for i, idx := range line.indexes {
 		item := f.items[idx]
 		itemMainSize := finalMain[i]
 		itemCrossSize := f.itemCross(item, target)
 
-		align := item.AlignSelf
+		align := item.alignSelf
 		if align == AlignAuto {
 			align = f.align
+		}
+		if align == AlignAuto {
+			align = AlignStretch
 		}
 
 		crossPos := crossStart
@@ -312,14 +337,20 @@ func (f *FlexView) drawLine(target rl.Rectangle, line flexLine, mainAvail float3
 			crossPos = crossStart + (lineCross-itemCrossSize)/2
 		}
 
-		var childTarget rl.Rectangle
-		if f.isRow() {
-			childTarget = rl.NewRectangle(mainPos, crossPos, itemMainSize, crossSizeFinal)
-		} else {
-			childTarget = rl.NewRectangle(crossPos, mainPos, crossSizeFinal, itemMainSize)
+		// Reverse directions mirror the layout so main-start is the right/bottom edge.
+		p := mainOrigin + mainPos
+		if f.isReverse() {
+			p = mainOrigin + mainAvail - mainPos - itemMainSize
 		}
 
-		item.Drawable.Draw(childTarget)
+		var childTarget rl.Rectangle
+		if f.isRow() {
+			childTarget = rl.NewRectangle(p, crossPos, itemMainSize, crossSizeFinal)
+		} else {
+			childTarget = rl.NewRectangle(crossPos, p, crossSizeFinal, itemMainSize)
+		}
+
+		item.drawable.Draw(childTarget)
 
 		mainPos += itemMainSize + between
 	}
