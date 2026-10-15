@@ -75,8 +75,7 @@ func NewGroup(nodes map[ID]Node) *Group {
 		}
 	}
 	calcLevels(tree, rootID)
-	calcXPos(tree)
-	calcPosiitons(tree)
+	calcPositions(tree, rootID)
 
 	drawlist := make([]ID, 0, len(tree))
 	for _, n := range tree {
@@ -101,81 +100,58 @@ func genID() ID {
 	return ID(fmt.Sprintf("gen-%d", nextID.Add(1)))
 }
 
-func calcXPos(tree map[ID]node) {
-	//maxW := 6 //getMaxW(tree)
-	level := 0
-	//prev := getLevel(tree, level)
-	for {
-		level++
-		cur := getLevel(tree, level)
-		if len(cur) == 0 {
-			break
-		}
-		//poss := make([]int, len(cur))
-		for i, id := range cur {
-			n := tree[id]
-			n.xpos = i
-			tree[id] = n
+// calcPositions lays the tree out top-down: every subtree gets a horizontal
+// share proportional to its number of leaves, children are ordered by ID and
+// placed under their parent, and parents are centred over their children.
+func calcPositions(tree map[ID]node, rootID ID) {
+	children := map[ID][]ID{}
+	depth := 0
+	for id, n := range tree {
+		depth = max(depth, n.level)
+		if id != rootID {
+			children[n.parent] = append(children[n.parent], id)
 		}
 	}
-}
-
-func getLevel(tree map[ID]node, level int) []ID {
-	res := []ID{}
-	for k, n := range tree {
-		if n.level == level {
-			res = append(res, k)
-		}
+	for _, cs := range children {
+		slices.Sort(cs)
 	}
 
-	slices.Sort(res)
-
-	return res
-}
-
-func calcPosiitons(tree map[ID]node) (int, int) {
-	level := 0
-	levels := [][]ID{}
-	maxW := 0
-	for {
-		ns := []ID{}
-		for _, n := range tree {
-			if n.level == level {
-				ns = append(ns, n.id)
-			}
+	leaves := map[ID]int{}
+	var countLeaves func(ID) int
+	countLeaves = func(id ID) int {
+		cs := children[id]
+		if len(cs) == 0 {
+			leaves[id] = 1
+			return 1
 		}
-		if len(ns) == 0 {
-			break
+		total := 0
+		for _, c := range cs {
+			total += countLeaves(c)
 		}
-		maxW = max(maxW, len(ns))
-		slices.SortFunc(ns, func(a, b ID) int {
-			aPar := tree[tree[a].parent]
-			bPar := tree[tree[b].parent]
-			d := aPar.xpos - bPar.xpos
-			if d != 0 {
-				return d
-			}
-			return tree[a].xpos - tree[b].xpos
-		})
-		levels = append(levels, ns)
-
-		level++
+		leaves[id] = total
+		return total
 	}
+	total := float32(countLeaves(rootID))
 
-	ys := 1 / float32(len(levels)-1)
-	//xs := 1 / float32(maxW)
-	for l := range levels {
-		xs := 1 / float32(len(levels[l]))
-		for c, id := range levels[l] {
-			n := tree[id]
+	ys := float32(1)
+	if depth > 0 {
+		ys = 1 / float32(depth)
+	}
+	var place func(id ID, offset int)
+	place = func(id ID, offset int) {
+		n := tree[id]
+		n.xpos = offset
+		xs := float32(leaves[id]) / total
+		n.p = rl.NewVector2(float32(offset)/total+xs/2, ys/2+ys*float32(n.level-1))
+		n.slot = rl.NewVector2(xs, ys)
+		tree[id] = n
 
-			n.p = rl.NewVector2(xs/2+xs*float32(c), ys/2+ys*float32(l-1))
-			n.slot = rl.NewVector2(xs, ys)
-			tree[n.id] = n
+		for _, c := range children[id] {
+			place(c, offset)
+			offset += leaves[c]
 		}
 	}
-
-	return maxW, len(levels)
+	place(rootID, 0)
 }
 
 func calcLevels(tree map[ID]node, rootID ID) {
@@ -220,7 +196,10 @@ func (g *Group) WithDebug() *Group {
 	return g
 }
 
-const nodeMargin = 20
+const (
+	nodeMargin  = 20
+	minNodeSize = 10
+)
 
 func (g *Group) Draw(t rl.Rectangle) {
 	for _, id := range g.drawOrder {
@@ -249,6 +228,8 @@ func (g *Group) Draw(t rl.Rectangle) {
 			max(0, t.Width*n.slot.X-nodeMargin),
 			max(0, t.Height*n.slot.Y-nodeMargin))
 		s := toDraw.GetSize(bound)
+		// Keep a visible box even when the content doesn't fit at all.
+		s = rl.NewVector2(max(s.X, minNodeSize), max(s.Y, minNodeSize))
 		r := rl.NewRectangle(c.X-s.X/2, c.Y-s.Y/2, s.X, s.Y)
 
 		// Opaque backing so edges don't show through the node.
