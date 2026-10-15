@@ -2,6 +2,8 @@ package plot
 
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
+
+	"github.com/rickardenglund/draw/input"
 )
 
 type mover struct {
@@ -12,14 +14,14 @@ type mover struct {
 }
 
 func (m *mover) Draw(target rl.Rectangle) {
-	mp := rl.GetMousePosition()
+	mp := input.MousePosition()
 	if m.start != nil {
 		rl.DrawLineV(*m.start, mp, rl.ColorAlpha(rl.White, .5))
 	}
 }
 
 func (m *mover) handleKeys(active bool, s scale) {
-	mp := rl.GetMousePosition()
+	mp := input.MousePosition()
 	if active {
 
 		if rl.IsKeyDown(rl.KeyD) {

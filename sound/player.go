@@ -5,6 +5,7 @@ import (
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 
+	"github.com/rickardenglund/draw/input"
 	"github.com/rickardenglund/draw/theme"
 )
 
@@ -68,7 +69,7 @@ func (p *Player) Draw(target rl.Rectangle) {
 			y := float32(math.Sin(f)) * r
 			btnPos = rl.Vector2Add(btnPos, rl.NewVector2(x, y))
 		}
-		mp := rl.GetMousePosition()
+		mp := input.MousePosition()
 		if rl.Vector2Distance(mp, btnPos) < btnRad && !playing {
 			clr = rl.ColorBrightness(clr, .2)
 		}

@@ -4,6 +4,7 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 
 	"github.com/rickardenglund/draw/animated"
+	"github.com/rickardenglund/draw/input"
 	"github.com/rickardenglund/draw/theme"
 )
 
@@ -34,7 +35,7 @@ func (c Circle) GetSize(target rl.Rectangle) rl.Vector2 {
 func (c *Circle) Draw(target rl.Rectangle) {
 	pos := rl.NewVector2(target.X, target.Y)
 	size := rl.NewVector2(target.Width, target.Height)
-	mp := rl.GetMousePosition()
+	mp := input.MousePosition()
 	p := rl.Vector2Add(pos, rl.Vector2Scale(size, .5))
 
 	clr := c.clr

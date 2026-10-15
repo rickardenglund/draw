@@ -3,6 +3,7 @@ package draw
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 
@@ -25,6 +26,22 @@ func fontPreferences() []fontPref {
 		{"C:\\Windows\\Fonts\\consola.ttf", 0},
 		{"C:\\Windows\\Fonts\\arial.ttf", 0},
 	}
+}
+
+// ScreenshotPath, when set, makes NewWindow render ScreenshotFrames frames,
+// save the last one as an image at ScreenshotPath and return.
+// Defaults to the DRAW_SCREENSHOT and DRAW_SCREENSHOT_FRAMES env vars.
+var (
+	ScreenshotPath   = os.Getenv("DRAW_SCREENSHOT")
+	ScreenshotFrames = envInt("DRAW_SCREENSHOT_FRAMES", 30)
+)
+
+func envInt(key string, def int) int {
+	if v, err := strconv.Atoi(os.Getenv(key)); err == nil {
+		return v
+	}
+
+	return def
 }
 
 func NewWindow(size rl.Vector2, init func(), objs ...Drawable) {
@@ -56,7 +73,7 @@ func NewWindow(size rl.Vector2, init func(), objs ...Drawable) {
 	defer rl.CloseAudioDevice()
 
 	init()
-	for !rl.WindowShouldClose() {
+	for frame := 1; !rl.WindowShouldClose(); frame++ {
 		rl.BeginDrawing()
 		rl.ClearBackground(theme.Nude)
 		for i := range objs {
@@ -66,6 +83,24 @@ func NewWindow(size rl.Vector2, init func(), objs ...Drawable) {
 			tar := rl.NewRectangle(p.X, p.Y, ms.X, ms.Y)
 			objs[i].Draw(tar)
 		}
+
+		if ScreenshotPath != "" && frame >= ScreenshotFrames {
+			saveScreenshot(ScreenshotPath)
+			rl.EndDrawing()
+			return
+		}
 		rl.EndDrawing()
 	}
+}
+
+func saveScreenshot(path string) {
+	rl.DrawRenderBatchActive()
+	img := rl.LoadImageFromScreen()
+	defer rl.UnloadImage(img)
+
+	if !rl.ExportImage(*img, path) {
+		fmt.Printf("failed to save screenshot: %s\n", path)
+		return
+	}
+	fmt.Printf("saved screenshot: %s\n", path)
 }

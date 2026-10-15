@@ -4,6 +4,7 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 
 	"github.com/rickardenglund/draw/draw"
+	"github.com/rickardenglund/draw/input"
 	"github.com/rickardenglund/draw/theme"
 )
 
@@ -21,7 +22,7 @@ func (b *Button) Draw(target rl.Rectangle) {
 	spacing := theme.Spacing + .5
 	ms := rl.MeasureTextEx(theme.Font, b.title, fontSize, spacing)
 
-	mp := rl.GetMousePosition()
+	mp := input.MousePosition()
 	padding := float32(5)
 
 	h := ms.Y + 2*padding

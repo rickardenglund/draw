@@ -6,6 +6,7 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 
 	"github.com/rickardenglund/draw/floating"
+	"github.com/rickardenglund/draw/input"
 	"github.com/rickardenglund/draw/theme"
 )
 
@@ -128,7 +129,7 @@ func (p *Plot[point]) Draw(targetWidget rl.Rectangle) {
 		rl.DrawRectangleLinesEx(p.selection.GetRect(), 2, rl.ColorAlpha(rl.White, .5))
 	}
 
-	mp := rl.GetMousePosition()
+	mp := input.MousePosition()
 	ci, d := findClosest(screenPs, mp)
 	if !p.selection.IsActive() &&
 		d < 30 &&

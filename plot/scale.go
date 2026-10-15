@@ -4,6 +4,8 @@ import (
 	"math"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
+
+	"github.com/rickardenglund/draw/input"
 )
 
 type scale struct {
@@ -66,7 +68,7 @@ func (l limits) CenterZoomed(f float32) limits {
 	}
 }
 func (l limits) Zoomed(f float32, s scale) limits {
-	mp := rl.GetMousePosition()
+	mp := input.MousePosition()
 	v := s.transformR(mp)
 
 	dx := l.maxX - l.minX

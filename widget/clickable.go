@@ -5,6 +5,7 @@ import (
 
 	"github.com/rickardenglund/draw/animated"
 	"github.com/rickardenglund/draw/draw"
+	"github.com/rickardenglund/draw/input"
 	"github.com/rickardenglund/draw/theme"
 )
 
@@ -16,7 +17,7 @@ type ClickAble struct {
 }
 
 func (c *ClickAble) Draw(target rl.Rectangle) {
-	mp := rl.GetMousePosition()
+	mp := input.MousePosition()
 	if rl.CheckCollisionPointRec(mp, target) {
 		if rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
 			c.onClick()

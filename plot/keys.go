@@ -2,10 +2,12 @@ package plot
 
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
+
+	"github.com/rickardenglund/draw/input"
 )
 
 func (p *Plot[point]) handleKeys(target rl.Rectangle, s scale) {
-	mp := rl.GetMousePosition()
+	mp := input.MousePosition()
 	active := rl.CheckCollisionPointRec(mp, target)
 	if active {
 		scroll := rl.GetMouseWheelMove()
