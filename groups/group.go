@@ -23,6 +23,8 @@ type node struct {
 	p      rl.Vector2
 	level  int
 	xpos   int
+	// slot is the share of the group's width and height the node may use.
+	slot rl.Vector2
 }
 
 type Group struct {
@@ -168,6 +170,7 @@ func calcPosiitons(tree map[ID]node) (int, int) {
 			n := tree[id]
 
 			n.p = rl.NewVector2(xs/2+xs*float32(c), ys/2+ys*float32(l-1))
+			n.slot = rl.NewVector2(xs, ys)
 			tree[n.id] = n
 		}
 	}
@@ -217,6 +220,8 @@ func (g *Group) WithDebug() *Group {
 	return g
 }
 
+const nodeMargin = 20
+
 func (g *Group) Draw(t rl.Rectangle) {
 	for _, id := range g.drawOrder {
 		n := g.nodes[id]
@@ -239,9 +244,15 @@ func (g *Group) Draw(t rl.Rectangle) {
 		c := pToPos(t, n.p)
 		toDraw := g.Nodes[n.id].Draw
 
-		s := toDraw.GetSize(rl.NewRectangle(c.X, c.Y, 100, 75))
+		// Nodes take their natural size, bounded by their slot so neighbours don't overlap.
+		bound := rl.NewRectangle(c.X, c.Y,
+			max(0, t.Width*n.slot.X-nodeMargin),
+			max(0, t.Height*n.slot.Y-nodeMargin))
+		s := toDraw.GetSize(bound)
 		r := rl.NewRectangle(c.X-s.X/2, c.Y-s.Y/2, s.X, s.Y)
 
+		// Opaque backing so edges don't show through the node.
+		rl.DrawRectangleRec(r, theme.Nude)
 		rl.DrawRectangleRec(r, rl.ColorAlpha(theme.Charcoal, .2))
 		rl.DrawRectangleLinesEx(r, 2, theme.Charcoal)
 		g.Nodes[n.id].Draw.Draw(r)

@@ -28,7 +28,14 @@ func (c *MultiColumnView) Draw(target rl.Rectangle) {
 	panelWidth := float32(10)
 
 	markerRadius := float32(5)
-	panelPartSize := target.Height / float32(len(c.objs))
+	// Rows get their natural height, stacked from the top, and shrink only
+	// when they don't all fit.
+	rowPad := float32(8)
+	rowHeight := float32(0)
+	for _, o := range c.objs {
+		rowHeight = max(rowHeight, o.Label.GetSize(target).Y+2*rowPad)
+	}
+	panelPartSize := min(rowHeight, target.Height/float32(len(c.objs)))
 	var mp1Y, mp2Y float32
 	for i, o := range c.objs {
 		y := target.Y + panelPartSize*float32(i) + panelPartSize/2
