@@ -37,6 +37,13 @@ type Plot[P point] struct {
 	mover mover
 
 	markers *markers
+
+	xLabel, yLabel string
+}
+
+// SetLabels sets the axis titles, e.g. "time [s]"; empty hides one.
+func (p *Plot[point]) SetLabels(x, y string) {
+	p.xLabel, p.yLabel = x, y
 }
 
 func (p Plot[point]) GetSize(target rl.Rectangle) rl.Vector2 {
@@ -54,16 +61,32 @@ func (p *Plot[point]) Draw(targetWidget rl.Rectangle) {
 	offset := p.mover.GetOffset()
 	ls = ls.translated(offset)
 
-	YTickSize := theme.MeaureTextPad(fmt.Sprintf(getFmt(ls.maxY-ls.minY), ls.maxY))
-	XTickSize := theme.MeaureTextPad(fmt.Sprintf(getFmt(ls.maxX), ls.maxX))
 	targetPlot := theme.Pad(targetWidget)
+	textH := theme.MeaureTextPad("0").Y
 
-	yAxisWidth := YTickSize.X
-	xAxisHeight := float32(XTickSize.Y)
+	// The y title sits on its own row above the y axis, the x title below
+	// the x tick labels.
+	titleH := float32(0)
+	if p.yLabel != "" {
+		titleH = textH
+	}
+	xAxisHeight := textH + 6
+	if p.xLabel != "" {
+		xAxisHeight += textH
+	}
 
-	targetYAxis := targetPlot
-	targetYAxis.Width = yAxisWidth
-	targetYAxis.Height -= xAxisHeight
+	dataH := targetPlot.Height - titleH - xAxisHeight
+	if dataH < textH {
+		// Too small to show anything readable; axes would overlap.
+		return
+	}
+	if p.yLabel != "" {
+		theme.DrawTextPad(p.yLabel, rl.NewVector2(targetPlot.X, targetPlot.Y), theme.Charcoal)
+	}
+	yts := yTicks(ls.minY, ls.maxY, dataH)
+	yAxisWidth := widest(yts) + 2*tickWidth
+
+	targetYAxis := rl.NewRectangle(targetPlot.X, targetPlot.Y+titleH, yAxisWidth, dataH)
 
 	targetXAxis := rl.NewRectangle(
 		targetYAxis.X+yAxisWidth,
@@ -74,16 +97,23 @@ func (p *Plot[point]) Draw(targetWidget rl.Rectangle) {
 
 	targetData := rl.NewRectangle(
 		targetPlot.X+yAxisWidth,
-		targetPlot.Y,
+		targetPlot.Y+titleH,
 		targetPlot.Width-yAxisWidth,
-		targetPlot.Height-xAxisHeight,
+		dataH,
 	)
+	if p.xLabel != "" {
+		m := theme.MeaureTextPad(p.xLabel)
+		theme.DrawTextPad(p.xLabel, rl.NewVector2(
+			targetXAxis.X+(targetXAxis.Width-m.X)/2,
+			targetXAxis.Y+targetXAxis.Height-textH,
+		), theme.Charcoal)
+	}
 
 	s := newScale(ls, targetData)
 	p.handleKeys(targetData, s)
 
-	drawAxisY(targetYAxis, s)
-	drawAxisX(targetXAxis, s)
+	drawAxisY(targetYAxis, s, yts)
+	drawAxisX(targetXAxis, s, xTicks(ls.minX, ls.maxX, targetXAxis.Width))
 
 	screenPs := make([]rl.Vector2, len(ps))
 	for i := range ps {

@@ -1,7 +1,6 @@
 package plot
 
 import (
-	"fmt"
 	"math"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -9,12 +8,9 @@ import (
 	"github.com/rickardenglund/draw/theme"
 )
 
-func drawAxisX(target rl.Rectangle, s scale) {
-	w := theme.MeaureTextPad(fmt.Sprintf(getFmt(s.l.DeltaX()), s.l.maxX))
-	n := int(math.Floor(float64(target.Width / w.X)))
-	dx := (s.l.maxX - s.l.minX) / float32(n)
-	for i := range n {
-		xTick(target, s, s.l.minX+float32(i)*dx, getFmt(s.l.maxX))
+func drawAxisX(target rl.Rectangle, s scale, ts []tick) {
+	for _, t := range ts {
+		xTick(target, s, t)
 	}
 }
 
@@ -33,52 +29,43 @@ func getFmt(v float32) string {
 	}
 }
 
-func xTick(target rl.Rectangle, s scale, x float32, format string) {
-	sp := s.transform(rl.NewVector2(x, 0))
+func xTick(target rl.Rectangle, s scale, t tick) {
+	sp := s.transform(rl.NewVector2(t.v, 0))
 	rad := float32(3)
 	sp.Y = target.Y + rad
 	rl.DrawCircleV(sp, rad, theme.Salmon)
-	text := fmt.Sprintf(format, x)
 
-	m := theme.MeaureTextPad(text)
+	m := theme.MeaureTextPad(t.label)
 	tp := rl.Vector2Add(sp, rl.NewVector2(-(m.X/2), 3))
-	theme.DrawTextPad(text, tp, theme.Charcoal)
+	// Keep the end labels inside the axis instead of clipped at the edge.
+	tp.X = max(target.X-m.X/2, min(tp.X, target.X+target.Width-m.X))
+	theme.DrawTextPad(t.label, tp, theme.Charcoal)
 }
 
-func drawAxisY(target rl.Rectangle, s scale) {
-	w := theme.MeaureTextPad("10")
-
+func drawAxisY(target rl.Rectangle, s scale, ts []tick) {
 	rl.DrawLineEx(
 		rl.NewVector2(target.X+target.Width, target.Y),
 		rl.NewVector2(target.X+target.Width, target.Y+target.Height),
 		2,
 		theme.Salmon,
 	)
-
-	//format := getFmt(s.l.maxY)
-	n := int(math.Floor(float64(target.Height / w.Y)))
-	dy := (s.l.maxY - s.l.minY) / float32(n)
-	for i := range n {
-		v := s.l.minY + float32(i)*dy
-		tickY(target, s, v, getFmt(s.l.maxY-s.l.minY))
+	for _, t := range ts {
+		tickY(target, s, t)
 	}
 }
 
-func tickY(target rl.Rectangle, s scale, y float32, format string) {
-	tickWidth := float32(3)
+const tickWidth = float32(3)
 
-	tickPos := s.transform(rl.NewVector2(0, y))
+// tickY draws a tick with its label right-aligned against the axis.
+func tickY(target rl.Rectangle, s scale, t tick) {
+	tickPos := s.transform(rl.NewVector2(0, t.v))
 	tickPos.X = target.X + target.Width
-	screenY := tickPos.Y
 
 	p0 := rl.Vector2Add(tickPos, rl.NewVector2(-tickWidth, 0))
 	p1 := rl.Vector2Add(tickPos, rl.NewVector2(tickWidth, 0))
 	rl.DrawLineEx(p0, p1, 1.5, theme.Charcoal)
 
-	text := fmt.Sprintf(format, y)
-	ms := theme.MeaureTextPad(text)
-
-	textPos := rl.NewVector2(target.X, screenY-ms.Y/2)
-	textPos.X = target.X
-	theme.DrawTextPad(text, textPos, theme.Charcoal)
+	ms := theme.MeaureTextPad(t.label)
+	textPos := rl.NewVector2(target.X+target.Width-tickWidth-ms.X, tickPos.Y-ms.Y/2)
+	theme.DrawTextPad(t.label, textPos, theme.Charcoal)
 }
