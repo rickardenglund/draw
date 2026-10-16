@@ -1,8 +1,10 @@
 package groups
 
 import (
+	"cmp"
 	"fmt"
 	"slices"
+	"strconv"
 	"sync/atomic"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -17,6 +19,12 @@ type Node struct {
 	Parent ID
 	Draw   draw.Drawable
 }
+// Frameless is implemented by node drawables that draw their own shape, e.g.
+// an icon with a label, instead of getting the default box.
+type Frameless interface {
+	Frameless()
+}
+
 type node struct {
 	id     ID
 	parent ID
@@ -113,7 +121,7 @@ func calcPositions(tree map[ID]node, rootID ID) {
 		}
 	}
 	for _, cs := range children {
-		slices.Sort(cs)
+		slices.SortFunc(cs, naturalCompare)
 	}
 
 	leaves := map[ID]int{}
@@ -232,11 +240,13 @@ func (g *Group) Draw(t rl.Rectangle) {
 		s = rl.NewVector2(max(s.X, minNodeSize), max(s.Y, minNodeSize))
 		r := rl.NewRectangle(c.X-s.X/2, c.Y-s.Y/2, s.X, s.Y)
 
-		// Opaque backing so edges don't show through the node.
-		rl.DrawRectangleRec(r, theme.Nude)
-		rl.DrawRectangleRec(r, rl.ColorAlpha(theme.Charcoal, .2))
-		rl.DrawRectangleLinesEx(r, 2, theme.Charcoal)
-		g.Nodes[n.id].Draw.Draw(r)
+		if _, ok := toDraw.(Frameless); !ok {
+			// Opaque backing so edges don't show through the node.
+			rl.DrawRectangleRec(r, theme.Nude)
+			rl.DrawRectangleRec(r, rl.ColorAlpha(theme.Charcoal, .2))
+			rl.DrawRectangleLinesEx(r, 2, theme.Charcoal)
+		}
+		toDraw.Draw(r)
 
 		if g.drawDebug {
 			//rl.DrawCircleV(c, 20, theme.Salmon)
@@ -257,4 +267,33 @@ func pToPos(t rl.Rectangle, p rl.Vector2) rl.Vector2 {
 
 func (g *Group) GetSize(target rl.Rectangle) rl.Vector2 {
 	return rl.NewVector2(target.Width, target.Height)
+}
+
+// naturalCompare orders runs of digits by value, so v2 comes before v10.
+func naturalCompare(a, b ID) int {
+	for a != "" && b != "" {
+		da, db := digitPrefix(a), digitPrefix(b)
+		if da != "" && db != "" {
+			na, _ := strconv.Atoi(string(da))
+			nb, _ := strconv.Atoi(string(db))
+			if c := cmp.Compare(na, nb); c != 0 {
+				return c
+			}
+			a, b = a[len(da):], b[len(db):]
+			continue
+		}
+		if c := cmp.Compare(a[0], b[0]); c != 0 {
+			return c
+		}
+		a, b = a[1:], b[1:]
+	}
+	return cmp.Compare(len(a), len(b))
+}
+
+func digitPrefix(s ID) ID {
+	i := 0
+	for i < len(s) && s[i] >= '0' && s[i] <= '9' {
+		i++
+	}
+	return s[:i]
 }

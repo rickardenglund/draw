@@ -72,6 +72,15 @@ func (r *MultiRowView) handleKeys(target rl.Rectangle) {
 	}
 }
 
+// SetActive switches to tab a, e.g. to jump to a view from another one.
+func (r *MultiRowView) SetActive(a int) {
+	if len(r.objs) == 0 {
+		return
+	}
+	r.active = min(max(a, 0), len(r.objs)-1)
+	r.markerX.Set(float32(r.active))
+}
+
 func (r *MultiRowView) Add(i MultiItem) {
 	r.objs = append(r.objs, i)
 }
