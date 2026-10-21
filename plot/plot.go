@@ -51,7 +51,7 @@ func (p Plot[point]) GetSize(target rl.Rectangle) rl.Vector2 {
 }
 
 func (p *Plot[point]) Draw(targetWidget rl.Rectangle) {
-	if len(p.cur) < 2 {
+	if len(p.cur) == 0 {
 		return
 	}
 
@@ -126,9 +126,10 @@ func (p *Plot[point]) Draw(targetWidget rl.Rectangle) {
 	if rl.CheckCollisionPointRec(o1, targetData) {
 		rl.DrawLineEx(o1, o2, 2, theme.Salmon)
 	}
-	dt := screenPs[1].X - screenPs[0].X
 	thickness := float32(2)
-	if dt < thickness && dt > 1 {
+	if len(screenPs) == 1 {
+		thickness = 8 // a lone point needs to stand out
+	} else if dt := screenPs[1].X - screenPs[0].X; dt < thickness && dt > 1 {
 		thickness = dt
 	}
 	for i := range screenPs {
@@ -342,16 +343,33 @@ func (p *Plot[point]) ShiftIn(in point, maxSize int) {
 func (p *Plot[point]) SetLimits(ls limits) {
 	p.prevLimits = p.getLimits()
 
+	// A flat range, e.g. a single point, is widened evenly so the data
+	// ends up in the middle.
 	if ls.minY == ls.maxY {
-		ls.minY -= 1
-		ls.maxY += 10
+		d := flatPad(ls.minY)
+		ls.minY -= d
+		ls.maxY += d
 	}
 	if ls.minX == ls.maxX {
-		ls.minX -= 1
-		ls.maxX += 10
+		d := flatPad(ls.minX)
+		ls.minX -= d
+		ls.maxX += d
 	}
 	p.curLimits = ls
 	p.limitsUpdated = rl.GetTime()
+}
+
+// flatPad is how far a flat range at v is widened on each side: 5% of v,
+// at least 1.
+func flatPad(v float32) float32 {
+	return max(1, abs(v)*.05)
+}
+
+func abs(v float32) float32 {
+	if v < 0 {
+		return -v
+	}
+	return v
 }
 
 func (p Plot[point]) getLimits() limits {
