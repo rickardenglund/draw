@@ -96,6 +96,7 @@ func (p *Plot[point]) Draw(targetWidget rl.Rectangle) {
 	s := newScale(ls, targetData)
 	p.handleKeys(targetData, s)
 
+	rl.DrawRectangleRec(targetData, dataBackground)
 	drawAxisY(targetYAxis, s, yts)
 	drawAxisX(targetXAxis, s, xTicks(ls.minX, ls.maxX, targetXAxis.Width, p.xUnit))
 
@@ -115,6 +116,7 @@ func (p *Plot[point]) Draw(targetWidget rl.Rectangle) {
 	} else {
 		drawLines(screenPs, targetData)
 	}
+	drawSideHints(screenPs, targetData)
 
 	if p.selection.IsActive() {
 		rl.DrawRectangleLinesEx(p.selectionRect(targetData), 2, rl.ColorAlpha(rl.White, .5))
@@ -157,6 +159,10 @@ func (p *Plot[point]) Draw(targetWidget rl.Rectangle) {
 
 // drawLines draws ps, in screen coordinates, as dots joined by lines.
 // Points outside target are drawn as larger red dots on its edge.
+// dataBackground tints the data area a little, like the app's scroll
+// tracks, so it stands apart from the axes and what is around the plot.
+var dataBackground = rl.Fade(theme.Charcoal, .06)
+
 func drawLines(ps []rl.Vector2, target rl.Rectangle) {
 	thickness := float32(2)
 	if len(ps) == 1 {
@@ -165,86 +171,46 @@ func drawLines(ps []rl.Vector2, target rl.Rectangle) {
 		thickness = dt
 	}
 	for _, sp := range ps {
-		clr := theme.Charcoal
-		th := thickness / 2
-		if !rl.CheckCollisionPointRec(sp, target) {
-			sp = clamp(sp, target)
-			clr = rl.Red
-			th *= 4
+		if rl.CheckCollisionPointRec(sp, target) {
+			rl.DrawCircleV(sp, thickness/2, theme.Charcoal)
 		}
-		rl.DrawCircleV(sp, th, clr)
 	}
+	drawEdgeFades(ps, target)
 	for i := 1; i < len(ps); i++ {
-		lineInSquare(ps[i-1], ps[i], target)
+		if a, b, ok := clipSegment(ps[i-1], ps[i], target); ok {
+			rl.DrawLineV(a, b, theme.Charcoal)
+		}
 	}
 }
 
-func lineInSquare(a, b rl.Vector2, target rl.Rectangle) {
-	aIn := rl.CheckCollisionPointRec(a, target)
-	bIn := rl.CheckCollisionPointRec(b, target)
-	if aIn && bIn {
-		rl.DrawLineV(a, b, theme.Charcoal)
-		return
+// clipSegment cuts the segment a-b to the rectangle r (Liang-Barsky); ok is
+// false when no part of it is inside.
+func clipSegment(a, b rl.Vector2, r rl.Rectangle) (rl.Vector2, rl.Vector2, bool) {
+	d := rl.Vector2Subtract(b, a)
+	t0, t1 := float32(0), float32(1)
+	for _, e := range [4]struct{ p, q float32 }{
+		{-d.X, a.X - r.X},
+		{d.X, r.X + r.Width - a.X},
+		{-d.Y, a.Y - r.Y},
+		{d.Y, r.Y + r.Height - a.Y},
+	} {
+		if e.p == 0 {
+			if e.q < 0 {
+				return a, b, false // parallel to and outside this edge
+			}
+			continue
+		}
+		t := e.q / e.p
+		if e.p < 0 {
+			t0 = max(t0, t)
+		} else {
+			t1 = min(t1, t)
+		}
+		if t0 > t1 {
+			return a, b, false
+		}
 	}
-	if !aIn && !bIn {
-		//mid := rl.Vector2Add(a,
-		//	rl.Vector2Scale(rl.Vector2Subtract(b, a), 0.5),
-		//)
-
-		//rl.DrawCircleV(mid, 3, rl.Blue)
-		//lineInSquare(a, mid, target)
-		//lineInSquare(b, mid, target)
-		return
-		//b = mid
-	}
-
-	if !aIn && bIn {
-		a, b = b, a
-	}
-
-	col := rl.Vector2{}
-	if colLineRect(a, b, target, &col) {
-		rl.DrawLineV(a, col, theme.Charcoal)
-	}
-}
-
-func colLineRect(a rl.Vector2, b rl.Vector2, target rl.Rectangle, res *rl.Vector2) bool {
-	if rl.CheckCollisionLines( // top
-		a,
-		b,
-		rl.NewVector2(target.X, target.Y),
-		rl.NewVector2(target.X+target.Width, target.Y),
-		res) {
-		return true
-	}
-
-	if rl.CheckCollisionLines( // left
-		a,
-		b,
-		rl.NewVector2(target.X, target.Y),
-		rl.NewVector2(target.X, target.Y+target.Height),
-		res) {
-		return true
-	}
-
-	if rl.CheckCollisionLines( // right
-		a,
-		b,
-		rl.NewVector2(target.X+target.Width, target.Y),
-		rl.NewVector2(target.X+target.Width, target.Y+target.Height),
-		res) {
-		return true
-	}
-	if rl.CheckCollisionLines( // bottom
-		a,
-		b,
-		rl.NewVector2(target.X, target.Y+target.Height),
-		rl.NewVector2(target.X+target.Width, target.Y+target.Height),
-		res) {
-		return true
-	}
-
-	return false
+	return rl.Vector2Add(a, rl.Vector2Scale(d, t0)), rl.Vector2Add(a, rl.Vector2Scale(d, t1)), true
 }
 
 func clamp(p rl.Vector2, target rl.Rectangle) rl.Vector2 {
