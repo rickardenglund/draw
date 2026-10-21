@@ -2,6 +2,7 @@ package text
 
 import (
 	"strings"
+	"unicode/utf8"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 
@@ -10,32 +11,69 @@ import (
 )
 
 func wrap(s string, size rl.Vector2) string {
-	ms := theme.MeaureTextPad(s)
-	if ms.X < size.X {
+	return wrapWith(s, size, theme.MeaureTextPad)
+}
+
+// wrapWith breaks s into lines no wider than size.X, at spaces where it
+// can; a word wider than a line is split, after punctuation if possible.
+// Lines that don't fit in size.Y are left out, but the first one is kept.
+func wrapWith(s string, size rl.Vector2, measure func(string) rl.Vector2) string {
+	if measure(s).X <= size.X {
 		return s
 	}
+	fits := func(line string) bool { return measure(line).X <= size.X }
 
-	sb := strings.Builder{}
-	words := strings.Split(s, " ")
-	first := true
-	for _, w := range words {
-		ms := theme.MeaureTextPad(sb.String() + " " + w)
-		if ms.Y > size.Y {
-			break
+	var lines []string
+	for _, para := range strings.Split(s, "\n") {
+		before := len(lines)
+		line := ""
+		for _, w := range strings.Fields(para) {
+			if line != "" {
+				if fits(line + " " + w) {
+					line += " " + w
+					continue
+				}
+				lines = append(lines, line)
+			}
+			// Split a word too wide for a line of its own.
+			for !fits(w) {
+				cut := longestFit(w, fits)
+				lines = append(lines, w[:cut])
+				w = w[cut:]
+			}
+			line = w
 		}
-
-		addingLine := ms.X > size.X
-		if addingLine {
-			sb.WriteString("\n")
+		if line != "" || len(lines) == before {
+			lines = append(lines, line)
 		}
-		if !addingLine && !first {
-			sb.WriteString(" ")
-		}
-		sb.WriteString(w)
-		first = false
 	}
 
-	return sb.String()
+	n := 1
+	for n < len(lines) && measure(strings.Join(lines[:n+1], "\n")).Y <= size.Y {
+		n++
+	}
+	return strings.Join(lines[:n], "\n")
+}
+
+// longestFit is where to cut w so that w[:cut] fits: after the last
+// punctuation in the second half of what fits, otherwise as late as
+// possible, but always after at least one character.
+func longestFit(w string, fits func(string) bool) int {
+	cut := 0
+	for i := range w {
+		if i > 0 && !fits(w[:i]) {
+			break
+		}
+		cut = i
+	}
+	if cut == 0 {
+		_, size := utf8.DecodeRuneInString(w)
+		return size
+	}
+	if i := strings.LastIndexAny(w[:cut], "./:-_"); i+1 >= cut/2 {
+		return i + 1
+	}
+	return cut
 }
 
 var _ draw.Drawable = &Wrapped{}
