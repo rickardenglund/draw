@@ -67,19 +67,22 @@ func (l limits) CenterZoomed(f float32) limits {
 		maxY: l.maxY + extraY/2,
 	}
 }
-func (l limits) Zoomed(f float32, s scale) limits {
-	mp := input.MousePosition()
-	v := s.transformR(mp)
 
+// Zoomed scales l by 1+f around the mouse position, so the point under the
+// mouse stays put.
+func (l limits) Zoomed(f float32, s scale) limits {
+	return l.zoomedAt(f, s.transformR(input.MousePosition()))
+}
+
+// zoomedAt scales l by 1+f around anchor, in data coordinates.
+func (l limits) zoomedAt(f float32, anchor rl.Vector2) limits {
 	dx := l.maxX - l.minX
-	newDx := dx * (1 + f)
-	extraX := newDx - dx
-	fx := (v.X - l.minX) / (l.maxX - l.minX)
+	extraX := dx * f
+	fx := (anchor.X - l.minX) / dx
 
 	dy := l.maxY - l.minY
-	newDy := dy * (1 + f)
-	extraY := newDy - dy
-	fy := (v.Y - l.minY) / (l.maxY - l.minY)
+	extraY := dy * f
+	fy := (anchor.Y - l.minY) / dy
 
 	return limits{
 		minX: l.minX - extraX*fx,
