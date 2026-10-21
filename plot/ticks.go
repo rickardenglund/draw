@@ -48,16 +48,17 @@ func ticks(lo, hi float32, maxCount int) []tick {
 	return ts
 }
 
-// xTicks are as many ticks over [lo, hi] as fit side by side in width.
-func xTicks(lo, hi, width float32) []tick {
+// xTicks are as many ticks over [lo, hi] as fit side by side in width,
+// the last one followed by unit.
+func xTicks(lo, hi, width float32, unit string) []tick {
 	gap := theme.MeaureTextPad("0").X
 	for n := max(1, int(width/(2*gap))); n > 1; n-- {
-		ts := ticks(lo, hi, n)
+		ts := withUnit(ticks(lo, hi, n), unit)
 		if float32(len(ts))*(widest(ts)+gap) <= width {
 			return ts
 		}
 	}
-	return ticks(lo, hi, 1)
+	return withUnit(ticks(lo, hi, 1), unit)
 }
 
 // yTicks are as many ticks over [lo, hi] as fit, with some air, in height.
@@ -67,6 +68,14 @@ func yTicks(lo, hi, height float32) []tick {
 	if len(ts) < 2 && height >= 2*h {
 		// A lone tick, often just 0, says nothing about the scale.
 		ts = ticks(lo, hi, 3)
+	}
+	return ts
+}
+
+// withUnit appends unit to the label of the last (highest) tick.
+func withUnit(ts []tick, unit string) []tick {
+	if unit != "" && len(ts) > 0 {
+		ts[len(ts)-1].label += " " + unit
 	}
 	return ts
 }
