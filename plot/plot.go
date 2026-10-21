@@ -117,7 +117,7 @@ func (p *Plot[point]) Draw(targetWidget rl.Rectangle) {
 	}
 
 	if p.selection.IsActive() {
-		rl.DrawRectangleLinesEx(p.selection.GetRect(), 2, rl.ColorAlpha(rl.White, .5))
+		rl.DrawRectangleLinesEx(p.selectionRect(targetData), 2, rl.ColorAlpha(rl.White, .5))
 	}
 
 	mp := input.MousePosition()

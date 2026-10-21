@@ -14,7 +14,7 @@ func (p *Plot[point]) handleKeys(target rl.Rectangle, s scale) {
 		if scroll != 0 {
 			zoom := float32(.1)
 			zoom *= -scroll
-			p.SetLimits(p.getLimits().Zoomed(zoom, s))
+			p.SetLimits(p.xOnly(p.getLimits().Zoomed(zoom, s)))
 		}
 		if rl.IsMouseButtonPressed(rl.MouseLeftButton) {
 			p.selection.a = &mp
@@ -24,9 +24,9 @@ func (p *Plot[point]) handleKeys(target rl.Rectangle, s scale) {
 				p.selection.b = &mp
 			}
 			if rl.IsMouseButtonReleased(rl.MouseButtonLeft) {
-				r := p.selection.GetRect()
-				if max(r.Width, r.Height) > 20 {
-					p.SetLimits(p.selection.GetLimits(s))
+				r := p.selectionRect(target)
+				if r.Width > 20 || (!p.stems && r.Height > 20) {
+					p.SetLimits(p.xOnly(p.selection.GetLimits(s)))
 				}
 				p.selection.Reset()
 			}
@@ -47,7 +47,7 @@ func (p *Plot[point]) handleKeys(target rl.Rectangle, s scale) {
 		}
 	} else {
 		if p.selection.IsActive() {
-			p.SetLimits(p.selection.GetLimits(s))
+			p.SetLimits(p.xOnly(p.selection.GetLimits(s)))
 			p.selection.Reset()
 		}
 	}

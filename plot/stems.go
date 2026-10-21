@@ -19,6 +19,25 @@ func (p *Plot[point]) SetStems(on bool) {
 	p.SetLimits(p.fit(p.cur).CenterZoomed(.01))
 }
 
+// xOnly keeps the current y range of a stem plot, so zooming there only
+// changes x: the stems stay anchored at 0 with their full heights in view.
+func (p *Plot[point]) xOnly(ls limits) limits {
+	if p.stems {
+		ls.minY, ls.maxY = p.curLimits.minY, p.curLimits.maxY
+	}
+	return ls
+}
+
+// selectionRect is the dragged zoom area; in a stem plot it spans the
+// whole data height, as only x is zoomed.
+func (p *Plot[point]) selectionRect(target rl.Rectangle) rl.Rectangle {
+	r := p.selection.GetRect()
+	if p.stems {
+		r.Y, r.Height = target.Y, target.Height
+	}
+	return r
+}
+
 // fit is the range showing all of ps.
 func (p *Plot[point]) fit(ps []point) limits {
 	ls := minmax(ps)
