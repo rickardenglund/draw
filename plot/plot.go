@@ -39,6 +39,8 @@ type Plot[P point] struct {
 	markers *markers
 
 	xLabel, yLabel string
+
+	stems bool
 }
 
 // SetLabels sets the axis titles, e.g. "time [s]"; empty hides one.
@@ -126,34 +128,10 @@ func (p *Plot[point]) Draw(targetWidget rl.Rectangle) {
 	if rl.CheckCollisionPointRec(o1, targetData) {
 		rl.DrawLineEx(o1, o2, 2, theme.Salmon)
 	}
-	thickness := float32(2)
-	if len(screenPs) == 1 {
-		thickness = 8 // a lone point needs to stand out
-	} else if dt := screenPs[1].X - screenPs[0].X; dt < thickness && dt > 1 {
-		thickness = dt
-	}
-	for i := range screenPs {
-		sp := screenPs[i]
-		clr := theme.Charcoal
-		th := thickness / 2
-		if !rl.CheckCollisionPointRec(sp, targetData) {
-			sp = clamp(sp, targetData)
-			//screenPs[i] = sp
-			clr = rl.Red
-			th *= 4
-		}
-		rl.DrawCircleV(sp, th, clr)
-	}
-
-	//rl.DrawLineStrip(screenPs, theme.Charcoal)
-	//for i := 1; i < len(screenPs); i++ {
-	//	if rl.CheckCollisionPointRec(screenPs[i], targetData) &&
-	//		rl.CheckCollisionPointRec(screenPs[i-1], targetData) {
-	//		rl.DrawLineV(screenPs[i-1], screenPs[i], theme.Charcoal)
-	//	}
-	//}
-	for i := 1; i < len(screenPs); i++ {
-		lineInSquare(screenPs[i-1], screenPs[i], targetData)
+	if p.stems {
+		drawStems(screenPs, s, targetData)
+	} else {
+		drawLines(screenPs, targetData)
 	}
 
 	if p.selection.IsActive() {
@@ -193,6 +171,30 @@ func (p *Plot[point]) Draw(targetWidget rl.Rectangle) {
 	p.markers.Draw(s)
 
 	p.mover.Draw(targetPlot)
+}
+
+// drawLines draws ps, in screen coordinates, as dots joined by lines.
+// Points outside target are drawn as larger red dots on its edge.
+func drawLines(ps []rl.Vector2, target rl.Rectangle) {
+	thickness := float32(2)
+	if len(ps) == 1 {
+		thickness = 8 // a lone point needs to stand out
+	} else if dt := ps[1].X - ps[0].X; dt < thickness && dt > 1 {
+		thickness = dt
+	}
+	for _, sp := range ps {
+		clr := theme.Charcoal
+		th := thickness / 2
+		if !rl.CheckCollisionPointRec(sp, target) {
+			sp = clamp(sp, target)
+			clr = rl.Red
+			th *= 4
+		}
+		rl.DrawCircleV(sp, th, clr)
+	}
+	for i := 1; i < len(ps); i++ {
+		lineInSquare(ps[i-1], ps[i], target)
+	}
 }
 
 func lineInSquare(a, b rl.Vector2, target rl.Rectangle) {
@@ -324,7 +326,7 @@ func (p *Plot[point]) Set(ps []point) {
 	p.prev = p.getPs()
 	p.cur = ps
 	p.psUpdated = rl.GetTime()
-	p.SetLimits(minmax(ps).CenterZoomed(.01))
+	p.SetLimits(p.fit(ps).CenterZoomed(.01))
 }
 
 func (p *Plot[point]) ShiftIn(in point, maxSize int) {
@@ -337,7 +339,7 @@ func (p *Plot[point]) ShiftIn(in point, maxSize int) {
 	p.cur = append(p.prev, in)
 
 	p.psUpdated = rl.GetTime()
-	p.SetLimits(minmax(p.cur).CenterZoomed(.01))
+	p.SetLimits(p.fit(p.cur).CenterZoomed(.01))
 }
 
 func (p *Plot[point]) SetLimits(ls limits) {
