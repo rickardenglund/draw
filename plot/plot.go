@@ -36,15 +36,18 @@ type Plot[P point] struct {
 
 	mover mover
 
-	markers *markers
+	markers    *markers
+	pointMarks pointMarks
+	activeMark activeMark
 
 	xUnit, yUnit string
 
 	stems bool
 }
 
-// SetUnits sets the axis units, e.g. "s"; they are shown after the last x
-// tick and the top y tick instead of on rows of their own. Empty hides one.
+// SetUnits sets the axis units, e.g. "s". The x unit is shown after the last
+// x tick, the y unit rotated along the y axis (after the top y tick when the
+// axis is too short for it). Empty hides one.
 func (p *Plot[point]) SetUnits(x, y string) {
 	p.xUnit, p.yUnit = x, y
 }
@@ -74,8 +77,15 @@ func (p *Plot[point]) Draw(targetWidget rl.Rectangle) {
 		// Too small to show anything readable; axes would overlap.
 		return
 	}
-	yts := withUnit(yTicks(ls.minY, ls.maxY, dataH), p.yUnit)
+	yts := yTicks(ls.minY, ls.maxY, dataH)
+	yUnit, ok := unitLines(p.yUnit, dataH)
+	if !ok {
+		yts = withUnit(yts, p.yUnit)
+	}
 	yAxisWidth := widest(yts) + 2*tickWidth
+	if len(yUnit) > 0 {
+		yAxisWidth += float32(len(yUnit))*theme.MeaureText("0").Y + textH - theme.MeaureText("0").Y
+	}
 
 	targetYAxis := rl.NewRectangle(targetPlot.X, targetPlot.Y, yAxisWidth, dataH)
 
@@ -98,6 +108,7 @@ func (p *Plot[point]) Draw(targetWidget rl.Rectangle) {
 
 	rl.DrawRectangleRec(targetData, dataBackground)
 	drawAxisY(targetYAxis, s, yts)
+	drawUnitY(targetYAxis, yUnit)
 	drawAxisX(targetXAxis, s, xTicks(ls.minX, ls.maxX, targetXAxis.Width, p.xUnit))
 
 	screenPs := make([]rl.Vector2, len(ps))
@@ -117,6 +128,7 @@ func (p *Plot[point]) Draw(targetWidget rl.Rectangle) {
 		drawLines(screenPs, targetData)
 	}
 	drawSideHints(screenPs, targetData)
+	p.pointMarks.draw(screenPs, s, targetData)
 
 	if p.selection.IsActive() {
 		rl.DrawRectangleLinesEx(p.selectionRect(targetData), 2, rl.ColorAlpha(rl.White, .5))
@@ -163,6 +175,10 @@ func (p *Plot[point]) Draw(targetWidget rl.Rectangle) {
 // tracks, so it stands apart from the axes and what is around the plot.
 var dataBackground = rl.Fade(theme.Charcoal, .06)
 
+// lineWidth makes sparse data, e.g. a trend, look like a dense waveform,
+// whose dots merge into a thick line.
+const lineWidth = 2.5
+
 func drawLines(ps []rl.Vector2, target rl.Rectangle) {
 	thickness := float32(2)
 	if len(ps) == 1 {
@@ -178,7 +194,7 @@ func drawLines(ps []rl.Vector2, target rl.Rectangle) {
 	drawEdgeFades(ps, target)
 	for i := 1; i < len(ps); i++ {
 		if a, b, ok := clipSegment(ps[i-1], ps[i], target); ok {
-			rl.DrawLineV(a, b, theme.Charcoal)
+			rl.DrawLineEx(a, b, lineWidth, theme.Charcoal)
 		}
 	}
 }
@@ -275,6 +291,14 @@ func (p *Plot[point]) Set(ps []point) {
 	p.cur = ps
 	p.psUpdated = rl.GetTime()
 	p.SetLimits(p.fit(ps).CenterZoomed(.01))
+}
+
+// SetKeepLimits is Set without fitting the limits to ps, e.g. to animate
+// the data towards zero while new data is loading.
+func (p *Plot[point]) SetKeepLimits(ps []point) {
+	p.prev = p.getPs()
+	p.cur = ps
+	p.psUpdated = rl.GetTime()
 }
 
 func (p *Plot[point]) ShiftIn(in point, maxSize int) {
