@@ -3,6 +3,8 @@ package views
 import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 
+	"github.com/rickardenglund/draw/input"
+
 	"github.com/rickardenglund/draw/animated"
 	"github.com/rickardenglund/draw/draw"
 	"github.com/rickardenglund/draw/theme"
@@ -112,12 +114,12 @@ func (c *MultiColumnView) handleKeys(target rl.Rectangle) {
 	if rl.IsKeyDown(rl.KeyLeftShift) || rl.IsKeyDown(rl.KeyRightShift) {
 		return
 	}
-	if rl.IsKeyPressed(rl.KeyJ) || rl.IsKeyPressed(rl.KeyDown) {
+	if input.KeyPressed(rl.KeyJ) || input.KeyPressed(rl.KeyDown) {
 		c.active = (c.active + 1) % len(c.objs)
 		c.markerY.Set(float32(c.active))
 	}
 
-	if rl.IsKeyPressed(rl.KeyK) || rl.IsKeyPressed(rl.KeyUp) {
+	if input.KeyPressed(rl.KeyK) || input.KeyPressed(rl.KeyUp) {
 		c.active -= 1
 		if c.active < 0 {
 			c.active = len(c.objs) - 1

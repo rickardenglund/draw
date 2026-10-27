@@ -45,3 +45,21 @@ func SetMousePosition(p rl.Vector2) {
 func ClearMousePosition() {
 	mouseOverride = nil
 }
+
+var queued = map[int32]bool{}
+
+// Update reads the keys pressed since the last frame; call it once per frame
+// before drawing (the window loop does).
+func Update() {
+	clear(queued)
+	for k := rl.GetKeyPressed(); k != 0; k = rl.GetKeyPressed() {
+		queued[k] = true
+	}
+}
+
+// KeyPressed is like rl.IsKeyPressed, but also reports keys that were pressed
+// and released within the same frame (e.g. tap keys on QMK keyboards with
+// home row mods), which rl.IsKeyPressed misses.
+func KeyPressed(key int32) bool {
+	return rl.IsKeyPressed(key) || queued[key]
+}

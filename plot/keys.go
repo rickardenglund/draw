@@ -32,17 +32,17 @@ func (p *Plot[point]) handleKeys(target rl.Rectangle, s scale) {
 			}
 		}
 
-		if rl.IsKeyPressed(rl.KeyF) {
+		if input.KeyPressed(rl.KeyF) {
 			p.SetLimits(p.fit(p.cur).Zoomed(.01, s))
 			p.mover.Reset()
 		}
 
-		if rl.IsKeyPressed(rl.KeyM) {
+		if input.KeyPressed(rl.KeyM) {
 			mpv := s.transformR(mp)
 			p.markers.addMarker(marker{v: mpv.X, harmonics: 3})
 		}
 
-		if rl.IsKeyPressed(rl.KeyR) {
+		if input.KeyPressed(rl.KeyR) {
 			p.markers = newMarkers()
 		}
 	} else {

@@ -7,6 +7,8 @@ import (
 
 	rl "github.com/gen2brain/raylib-go/raylib"
 
+	"github.com/rickardenglund/draw/input"
+
 	"github.com/rickardenglund/draw/theme"
 )
 
@@ -75,6 +77,7 @@ func NewWindow(size rl.Vector2, init func(), objs ...Drawable) {
 	init()
 	for frame := 1; !rl.WindowShouldClose(); frame++ {
 		rl.BeginDrawing()
+		input.Update()
 		rl.ClearBackground(theme.Nude)
 		for i := range objs {
 			border := rl.NewVector2(1, 1)

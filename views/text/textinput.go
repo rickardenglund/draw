@@ -4,6 +4,8 @@ import (
 	gui "github.com/gen2brain/raylib-go/raygui"
 	rl "github.com/gen2brain/raylib-go/raylib"
 
+	"github.com/rickardenglund/draw/input"
+
 	"github.com/rickardenglund/draw/draw"
 	"github.com/rickardenglund/draw/theme"
 )
@@ -48,7 +50,7 @@ func pastePressed() bool {
 		rl.IsKeyDown(rl.KeyLeftSuper) ||
 		rl.IsKeyDown(rl.KeyLeftControl) ||
 		rl.IsKeyDown(rl.KeyRightControl)
-	return ctrl && rl.IsKeyPressed(rl.KeyV)
+	return ctrl && input.KeyPressed(rl.KeyV)
 }
 
 func NewTextInput(s string, callback func(string)) *TextInput {
