@@ -16,19 +16,19 @@ func Test_transform(t *testing.T) {
 	}{
 		{
 			target: rl.NewRectangle(100, 100, 100, 100),
-			ps:     []rl.Vector2{{0, 0}, {100, 100}},
+			ps:     []rl.Vector2{{X: 0, Y: 0}, {X: 100, Y: 100}},
 			p:      rl.Vector2{X: 50},
 			want:   rl.Vector2{X: 150, Y: 200},
 		},
 		{
 			target: rl.NewRectangle(100, 200, 100, 200),
-			ps:     []rl.Vector2{{0, 0}, {100, 100}},
+			ps:     []rl.Vector2{{X: 0, Y: 0}, {X: 100, Y: 100}},
 			p:      rl.Vector2{X: 50, Y: 100},
 			want:   rl.Vector2{X: 150, Y: 200},
 		},
 		{
 			target: rl.NewRectangle(100, 200, 200, 200),
-			ps:     []rl.Vector2{{0, 0}, {100, 100}},
+			ps:     []rl.Vector2{{X: 0, Y: 0}, {X: 100, Y: 100}},
 			p:      rl.Vector2{X: 100, Y: 100},
 			want:   rl.Vector2{X: 300, Y: 200},
 		},

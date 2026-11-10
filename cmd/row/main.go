@@ -39,18 +39,18 @@ func main2() {
 		views.NewRowView(
 			text.NewWrap("Hej jag heter Rickard vad heter du? Vilken är din favoritglass? Jag gillara jorggubbsglass! Men jag tycker också att det är fantastiskt med banan i glass"),
 			views.NewMultiRowView(
-				views.MultiItem{text.NewTextf("r1"), shapes.NewCircle(15, rl.Red)},
-				views.MultiItem{text.NewTextf("Kanin"), shapes.NewCircle(15, rl.Green)},
-				views.MultiItem{text.NewTextf("r4"), shapes.NewCircle(15, rl.Blue)},
+				views.MultiItem{Label: text.NewTextf("r1"), Full: shapes.NewCircle(15, rl.Red)},
+				views.MultiItem{Label: text.NewTextf("Kanin"), Full: shapes.NewCircle(15, rl.Green)},
+				views.MultiItem{Label: text.NewTextf("r4"), Full: shapes.NewCircle(15, rl.Blue)},
 			),
 		),
 
 		views.NewRowView(
 			text.NewTextf("hej"),
 			views.NewMultiColumnView(
-				views.MultiItem{text.NewTextf("r1"), shapes.NewCircle(15, rl.Red)},
-				views.MultiItem{text.NewTextf("r2"), shapes.NewCircle(15, rl.Green)},
-				views.MultiItem{text.NewTextf("r4"), shapes.NewCircle(15, rl.Blue)},
+				views.MultiItem{Label: text.NewTextf("r1"), Full: shapes.NewCircle(15, rl.Red)},
+				views.MultiItem{Label: text.NewTextf("r2"), Full: shapes.NewCircle(15, rl.Green)},
+				views.MultiItem{Label: text.NewTextf("r4"), Full: shapes.NewCircle(15, rl.Blue)},
 			),
 		),
 	)
