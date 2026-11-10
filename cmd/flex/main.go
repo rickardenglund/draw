@@ -39,10 +39,10 @@ func main() {
 		SetJustifyContent(views.JustifySpaceEvenly).
 		SetGap(8)
 	for _, s := range []string{"one", "two", "three", "four", "five", "six", "seven", "eight"} {
-		wrap.Add(text.NewTextf(s))
+		wrap.Add(text.NewTextf("%s", s))
 	}
 	for _, s := range []string{"one", "two", "three", "four", "five", "six", "seven", "eight"} {
-		wrap.Add(text.NewTextf(s))
+		wrap.Add(text.NewTextf("%s", s))
 	}
 
 	c := views.NewColumnView(grow, align, wrap, widget.NewButton("hek", func() {

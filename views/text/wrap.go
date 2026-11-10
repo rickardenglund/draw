@@ -84,12 +84,12 @@ type Wrapped struct {
 
 func (w Wrapped) Draw(target rl.Rectangle) {
 	s := wrap(w.s, rl.NewVector2(target.Width, target.Height))
-	NewTextf(s).Draw(target)
+	NewTextf("%s", s).Draw(target)
 }
 
 func (w Wrapped) GetSize(target rl.Rectangle) rl.Vector2 {
 	s := wrap(w.s, rl.NewVector2(target.Width, target.Height))
-	return NewTextf(s).GetSize(target)
+	return NewTextf("%s", s).GetSize(target)
 }
 
 func NewWrap(s string) *Wrapped {

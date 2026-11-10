@@ -14,7 +14,7 @@ func main() {
 	)
 	c.Add(
 		text.NewTextInput("lbl2", func(v string) {
-			c.Add(text.NewTextf(v))
+			c.Add(text.NewTextf("%s", v))
 		}))
 	v := text.NewTopBar(text.NewTextf("my title"), c)
 	draw.NewWindow(rl.NewVector2(400, 400), func() {}, v)

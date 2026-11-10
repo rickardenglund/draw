@@ -21,5 +21,5 @@ DRAW_MOUSE=250,349 DRAW_SCREENSHOT=/tmp/x.png go run ./cmd/flex   # with hover
 
 ## Testing
 
-- `go test ./plot` has a failing `Test_limits_Zoomed` and vet warnings in
-  `plot/plot_test.go` that predate this note.
+- `go test ./...` should pass cleanly, including `go vet` (e.g. pass
+  non-constant strings to `text.NewTextf` as `NewTextf("%s", s)`).
