@@ -50,12 +50,21 @@ func (c *MultiColumnView) Draw(target rl.Rectangle) {
 	scroll := c.scroll.Get()
 
 	bottom := target.Y + target.Height
+	for _, o := range c.objs {
+		panelWidth = max(panelWidth, o.Label.GetSize(target).X+2*markerRadius)
+	}
+	clicked := rl.IsMouseButtonPressed(rl.MouseButtonLeft)
+	mouse := input.MousePosition()
 	for i, o := range c.objs {
 		rowY := target.Y + rowHeight*(float32(i)-scroll)
 		labelSize := o.Label.GetSize(target)
-		panelWidth = max(panelWidth, labelSize.X+2*markerRadius)
 		if rowY < target.Y-0.5 || rowY+rowHeight > bottom+0.5 {
 			continue
+		}
+		rowRect := rl.NewRectangle(target.X, rowY, panelWidth, rowHeight)
+		if clicked && i != c.active && rl.CheckCollisionPointRec(mouse, rowRect) {
+			c.active = i
+			c.markerY.Set(float32(i))
 		}
 		labelRect := rl.NewRectangle(target.X+markerRadius, rowY+(rowHeight-labelSize.Y)/2, labelSize.X, labelSize.Y)
 		o.Label.Draw(labelRect)

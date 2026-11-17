@@ -30,6 +30,21 @@ func (r *MultiRowView) Draw(target rl.Rectangle) {
 
 	panelPartSize := target.Width / float32(len(r.objs))
 
+	for _, o := range r.objs {
+		panelHeight = max(panelHeight, o.Label.GetSize(target).Y)
+	}
+	if rl.IsMouseButtonPressed(rl.MouseButtonLeft) {
+		mouse := input.MousePosition()
+		panel := rl.NewRectangle(target.X, target.Y, target.Width, panelHeight)
+		if rl.CheckCollisionPointRec(mouse, panel) {
+			i := min(int((mouse.X-target.X)/panelPartSize), len(r.objs)-1)
+			if i != r.active {
+				r.active = i
+				r.markerX.Set(float32(i))
+			}
+		}
+	}
+
 	maxLabelSize := float32(0)
 	for i, o := range r.objs {
 		labelSize := o.Label.GetSize(target)
